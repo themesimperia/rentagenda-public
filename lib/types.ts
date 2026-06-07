@@ -21,6 +21,8 @@ export interface PublicListing {
   size_sqm: number | null;
   amenities: string[];
   photos: string[];
+  owner_name?: string | null;
+  owner_avatar?: string | null;
   status: 'published' | 'unpublished';
   availability_summary: null;
   created_at: Timestamp;

@@ -33,10 +33,10 @@ export default async function HomePage() {
 
         <div className="mx-auto max-w-5xl px-4 py-24 text-center sm:px-6 sm:py-28">
           <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
-            Home Is Just a Search Away
+            Find Your Next Home
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-lg text-slate-200">
-            Explore listings published directly by verified owners — for every budget, style, and location.
+            Where every real estate goal becomes reality — listings direct from verified owners.
           </p>
 
           <div className="mt-10">
