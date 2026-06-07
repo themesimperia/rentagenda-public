@@ -83,7 +83,7 @@ export function DetailPanel({
           )}
           {avail.available
             ? 'Available now'
-            : `Currently occupied — ${avail.label.replace('Available ', 'free from ')}`}
+            : `Occupied — ${avail.daysLeft} day${avail.daysLeft === 1 ? '' : 's'} remaining (free ${avail.freeDate})`}
         </div>
 
         {/* Owner */}

@@ -38,26 +38,40 @@ export function mapEmbedUrl(lat: number, lng: number): string {
 
 export interface Availability {
   available: boolean;
-  label: string;
   /** 'green' = available now, 'amber' = occupied until a future date. */
   tone: 'green' | 'amber';
+  /** Days until the unit frees up (0 when available now). */
+  daysLeft: number;
+  /** Formatted date the unit frees up, or null when available now. */
+  freeDate: string | null;
+  /** Short badge label: "Available now" or "N days left". */
+  label: string;
 }
 
+const MS_PER_DAY = 86_400_000;
+
 /**
- * Interprets a listing's `available_from` date into a display badge.
- * A null/absent or past date means the unit is available now.
+ * Interprets a listing's `available_from` date. A null/absent or past date
+ * means available now; a future date means occupied with N days remaining.
  */
 export function availability(availableFrom?: string | null): Availability {
   if (availableFrom) {
     const ts = new Date(availableFrom).getTime();
     if (!Number.isNaN(ts) && ts > Date.now()) {
-      const label = new Date(ts).toLocaleDateString('en-US', {
+      const daysLeft = Math.ceil((ts - Date.now()) / MS_PER_DAY);
+      const freeDate = new Date(ts).toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
         year: 'numeric',
       });
-      return { available: false, label: `Available ${label}`, tone: 'amber' };
+      return {
+        available: false,
+        tone: 'amber',
+        daysLeft,
+        freeDate,
+        label: `${daysLeft} day${daysLeft === 1 ? '' : 's'} left`,
+      };
     }
   }
-  return { available: true, label: 'Available now', tone: 'green' };
+  return { available: true, tone: 'green', daysLeft: 0, freeDate: null, label: 'Available now' };
 }
