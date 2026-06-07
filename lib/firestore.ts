@@ -2,7 +2,6 @@ import {
   collection,
   query,
   where,
-  orderBy,
   getDocs,
   getDoc,
   doc,
@@ -15,11 +14,15 @@ import type { PublicListing, InquiryFormData } from './types';
 export async function getPublishedListings(): Promise<PublicListing[]> {
   const q = query(
     collection(db, 'public_listings'),
-    where('status', '==', 'published'),
-    orderBy('published_at', 'desc')
+    where('status', '==', 'published')
   );
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() } as PublicListing));
+  const listings = snap.docs.map(d => ({ id: d.id, ...d.data() } as PublicListing));
+  return listings.sort((a, b) => {
+    const aTime = a.published_at?.toMillis?.() ?? 0;
+    const bTime = b.published_at?.toMillis?.() ?? 0;
+    return bTime - aTime;
+  });
 }
 
 export async function getListing(id: string): Promise<PublicListing | null> {
