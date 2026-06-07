@@ -66,7 +66,7 @@ function TermBadge({ listing }: { listing: PublicListing }) {
 }
 
 function AvailabilityBadge({ listing }: { listing: PublicListing }) {
-  const a = availability(listing.available_from);
+  const a = availability(listing);
   return (
     <span
       className={`absolute right-3 top-3 rounded-full px-2.5 py-1 text-xs font-semibold shadow-sm ${

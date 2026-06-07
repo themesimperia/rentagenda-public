@@ -15,7 +15,7 @@ interface ListingCardProps {
 
 export function ListingCard({ listing, onSelect, selected, href }: ListingCardProps) {
   const photo = listing.photos[0];
-  const avail = availability(listing.available_from);
+  const avail = availability(listing);
 
   const card = (
     <div

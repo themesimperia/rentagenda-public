@@ -36,7 +36,7 @@ export function DetailPanel({
 }) {
   const [tab, setTab] = useState<Tab>('overview');
   const [inquiryOpen, setInquiryOpen] = useState(false);
-  const avail = availability(listing.available_from);
+  const avail = availability(listing);
   const ownerName = listing.owner_name?.trim();
 
   return (
@@ -83,7 +83,9 @@ export function DetailPanel({
           )}
           {avail.available
             ? 'Available now'
-            : `Occupied — ${avail.daysLeft} day${avail.daysLeft === 1 ? '' : 's'} remaining (free ${avail.freeDate})`}
+            : avail.freeDate
+              ? `Occupied — ${avail.daysLeft} day${avail.daysLeft === 1 ? '' : 's'} remaining (free ${avail.freeDate})`
+              : 'Currently occupied'}
         </div>
 
         {/* Owner */}

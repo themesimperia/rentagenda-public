@@ -23,7 +23,9 @@ export interface PublicListing {
   photos: string[];
   owner_name?: string | null;
   owner_avatar?: string | null;
-  /** ISO date (YYYY-MM-DD) the unit frees up; null/absent = available now. */
+  /** Explicit occupancy of the unit (derived from the apartment's status). */
+  availability_status?: 'available' | 'occupied';
+  /** ISO date (YYYY-MM-DD) the unit frees up; null/absent = unknown. */
   available_from?: string | null;
   status: 'published' | 'unpublished';
   availability_summary: null;

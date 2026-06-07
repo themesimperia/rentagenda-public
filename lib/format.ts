@@ -1,4 +1,4 @@
-import type { PropertyType, RentalTerm } from './types';
+import type { PropertyType, RentalTerm, PublicListing } from './types';
 
 export const PROPERTY_TYPE_LABELS: Record<PropertyType, string> = {
   apartment: 'Apartment',
@@ -50,28 +50,41 @@ export interface Availability {
 
 const MS_PER_DAY = 86_400_000;
 
+type AvailabilityInput = Pick<PublicListing, 'availability_status' | 'available_from'>;
+
 /**
- * Interprets a listing's `available_from` date. A null/absent or past date
- * means available now; a future date means occupied with N days remaining.
+ * Interprets a listing's occupancy. `availability_status === 'occupied'` (or a
+ * future `available_from`) means occupied — with a day countdown when the free
+ * date is known, otherwise a plain "Occupied". Anything else is available now.
  */
-export function availability(availableFrom?: string | null): Availability {
-  if (availableFrom) {
-    const ts = new Date(availableFrom).getTime();
+export function availability(input: AvailabilityInput): Availability {
+  const from = input.available_from;
+  let daysLeft = 0;
+  let freeDate: string | null = null;
+
+  if (from) {
+    const ts = new Date(from).getTime();
     if (!Number.isNaN(ts) && ts > Date.now()) {
-      const daysLeft = Math.ceil((ts - Date.now()) / MS_PER_DAY);
-      const freeDate = new Date(ts).toLocaleDateString('en-US', {
+      daysLeft = Math.ceil((ts - Date.now()) / MS_PER_DAY);
+      freeDate = new Date(ts).toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
         year: 'numeric',
       });
-      return {
-        available: false,
-        tone: 'amber',
-        daysLeft,
-        freeDate,
-        label: `${daysLeft} day${daysLeft === 1 ? '' : 's'} left`,
-      };
     }
   }
+
+  const occupied = input.availability_status === 'occupied' || freeDate != null;
+
+  if (occupied) {
+    return {
+      available: false,
+      tone: 'amber',
+      daysLeft,
+      freeDate,
+      label: freeDate ? `${daysLeft} day${daysLeft === 1 ? '' : 's'} left` : 'Occupied',
+    };
+  }
+
   return { available: true, tone: 'green', daysLeft: 0, freeDate: null, label: 'Available now' };
 }
