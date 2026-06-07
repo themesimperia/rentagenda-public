@@ -24,8 +24,10 @@ export async function getPublishedListings(): Promise<PublicListing[]> {
 
 export async function getListing(id: string): Promise<PublicListing | null> {
   const snap = await getDoc(doc(db, 'public_listings', id));
-  if (!snap.exists() || snap.data().status !== 'published') return null;
-  return { id: snap.id, ...snap.data() } as PublicListing;
+  if (!snap.exists()) return null;
+  const data = snap.data();
+  if (data.status !== 'published') return null;
+  return { id: snap.id, ...data } as PublicListing;
 }
 
 export async function createInquiry(

@@ -31,6 +31,6 @@ export interface PublicListing {
 export interface InquiryFormData {
   guest_name: string;
   guest_email: string;
-  guest_phone: string;
-  message: string;
+  guest_phone?: string;
+  message?: string;
 }
