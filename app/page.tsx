@@ -1,61 +1,64 @@
-import Link from 'next/link';
-import { ArrowRight, Building2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { ListingGrid } from '@/components/ListingGrid';
+import { ShieldCheck, BadgeDollarSign, MessageSquare, Building2 } from 'lucide-react';
+import { HeroSearch } from '@/components/HeroSearch';
+import { FeaturedProperties } from '@/components/FeaturedProperties';
 import { getPublishedListings } from '@/lib/firestore';
+import { deriveLocations } from '@/lib/filter';
 
 export const revalidate = 300;
 
+// Background photo (CSS background — no next/image remote config needed).
+const HERO_BG =
+  'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1920&q=80';
+
 export default async function HomePage() {
-  const allListings = await getPublishedListings();
-  const featured = allListings.slice(0, 6);
+  const listings = await getPublishedListings();
+  const regions = deriveLocations(listings);
+
+  const stats = [
+    { icon: Building2, value: `${listings.length}`, label: 'Live listings' },
+    { icon: ShieldCheck, value: '100%', label: 'Verified owners' },
+    { icon: BadgeDollarSign, value: '$0', label: 'Agent fees' },
+    { icon: MessageSquare, value: 'Direct', label: 'Owner contact' },
+  ];
 
   return (
     <>
       {/* Hero */}
-      <section className="bg-gradient-to-br from-blue-50 via-white to-slate-50 py-20 text-center">
-        <div className="mx-auto max-w-3xl px-4">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-1.5 text-sm font-medium text-blue-700">
-            <Building2 className="h-4 w-4" />
-            Properties published by verified owners
-          </div>
-          <h1 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
-            Find your next property
+      <section className="relative isolate overflow-hidden">
+        <div
+          className="absolute inset-0 -z-10 bg-slate-800 bg-cover bg-center"
+          style={{ backgroundImage: `url(${HERO_BG})` }}
+        />
+        <div className="absolute inset-0 -z-10 bg-slate-900/60" />
+
+        <div className="mx-auto max-w-5xl px-4 py-24 text-center sm:px-6 sm:py-28">
+          <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
+            Home Is Just a Search Away
           </h1>
-          <p className="mt-4 text-lg text-slate-600">
-            Browse apartments, houses, villas, offices, and vacation rentals —
-            listed directly by property owners.
+          <p className="mx-auto mt-4 max-w-xl text-lg text-slate-200">
+            Explore listings published directly by verified owners — for every budget, style, and location.
           </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700">
-              <Link href="/listings">
-                Browse all listings <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <a href="https://rent-agenda.vercel.app" target="_blank" rel="noopener noreferrer">
-                List your property
-              </a>
-            </Button>
+
+          <div className="mt-10">
+            <HeroSearch regions={regions} />
+          </div>
+
+          {/* Stats */}
+          <div className="mt-16 grid grid-cols-2 gap-8 sm:grid-cols-4">
+            {stats.map(s => (
+              <div key={s.label} className="text-center">
+                <p className="text-3xl font-bold text-white">{s.value}</p>
+                <p className="mt-1 text-xs font-medium uppercase tracking-wide text-slate-300">
+                  {s.label}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Featured listings */}
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-        <div className="mb-8 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-slate-900">Latest listings</h2>
-          {allListings.length > 6 && (
-            <Link
-              href="/listings"
-              className="flex items-center gap-1 text-sm text-blue-600 hover:underline"
-            >
-              View all {allListings.length} <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          )}
-        </div>
-        <ListingGrid listings={featured} />
-      </section>
+      {/* Featured */}
+      <FeaturedProperties listings={listings} />
     </>
   );
 }

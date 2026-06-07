@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { propertyTypeLabel } from '@/lib/format';
 import {
   type MarketplaceFilters,
+  EMPTY_FILTERS,
   isFiltered,
 } from '@/lib/filter';
 import type { PropertyType } from '@/lib/types';
@@ -58,7 +59,7 @@ export function FilterSidebar({
         {isFiltered(filters) && (
           <button
             type="button"
-            onClick={() => onChange({ ...filters, locations: [], types: [], amenities: [], priceMin: null, priceMax: null, search: '' })}
+            onClick={() => onChange(EMPTY_FILTERS)}
             className="text-xs font-medium text-blue-600 hover:underline"
           >
             Clear all

@@ -16,10 +16,17 @@ import {
 } from '@/lib/filter';
 import type { PublicListing } from '@/lib/types';
 
-export function MarketplaceDashboard() {
+export function MarketplaceDashboard({
+  initialFilters,
+}: {
+  initialFilters?: Partial<MarketplaceFilters>;
+}) {
   const [listings, setListings] = useState<PublicListing[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState<MarketplaceFilters>(EMPTY_FILTERS);
+  const [filters, setFilters] = useState<MarketplaceFilters>({
+    ...EMPTY_FILTERS,
+    ...initialFilters,
+  });
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   useEffect(() => {

@@ -1,9 +1,10 @@
-import type { PublicListing, PropertyType } from './types';
+import type { PublicListing, PropertyType, RentalTerm } from './types';
 
 export interface MarketplaceFilters {
   search: string;
   locations: string[];
   types: PropertyType[];
+  terms: RentalTerm[];
   amenities: string[];
   priceMin: number | null;
   priceMax: number | null;
@@ -13,6 +14,7 @@ export const EMPTY_FILTERS: MarketplaceFilters = {
   search: '',
   locations: [],
   types: [],
+  terms: [],
   amenities: [],
   priceMin: null,
   priceMax: null,
@@ -30,6 +32,7 @@ export function applyFilters(
     }
     if (f.locations.length && !f.locations.includes(l.address_public)) return false;
     if (f.types.length && !f.types.includes(l.property_type)) return false;
+    if (f.terms.length && !f.terms.includes(l.rental_term)) return false;
     if (f.priceMin != null && (l.price == null || l.price < f.priceMin)) return false;
     if (f.priceMax != null && (l.price == null || l.price > f.priceMax)) return false;
     if (f.amenities.length && !f.amenities.every(a => l.amenities.includes(a))) return false;
@@ -65,6 +68,7 @@ export function isFiltered(f: MarketplaceFilters): boolean {
     f.search !== '' ||
     f.locations.length > 0 ||
     f.types.length > 0 ||
+    f.terms.length > 0 ||
     f.amenities.length > 0 ||
     f.priceMin != null ||
     f.priceMax != null
