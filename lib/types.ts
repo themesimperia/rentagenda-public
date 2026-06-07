@@ -1,5 +1,3 @@
-import type { Timestamp } from 'firebase/firestore';
-
 export type PropertyType = 'apartment' | 'house' | 'villa' | 'office' | 'vacation';
 export type RentalTerm = 'long_term' | 'short_term';
 
@@ -29,9 +27,10 @@ export interface PublicListing {
   available_from?: string | null;
   status: 'published' | 'unpublished';
   availability_summary: null;
-  created_at: Timestamp;
-  published_at: Timestamp;
-  updated_at: Timestamp;
+  /** Epoch milliseconds (converted from Firestore Timestamp at the data layer). */
+  created_at: number | null;
+  published_at: number | null;
+  updated_at: number | null;
 }
 
 export interface InquiryFormData {
