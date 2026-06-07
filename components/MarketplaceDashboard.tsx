@@ -1,0 +1,113 @@
+'use client';
+
+import { useEffect, useMemo, useState } from 'react';
+import { SearchX } from 'lucide-react';
+import { FilterSidebar } from '@/components/FilterSidebar';
+import { ListingCard } from '@/components/ListingCard';
+import { DetailPanel } from '@/components/DetailPanel';
+import { getPublishedListings } from '@/lib/firestore';
+import {
+  type MarketplaceFilters,
+  EMPTY_FILTERS,
+  applyFilters,
+  deriveLocations,
+  deriveTypes,
+  deriveAmenities,
+} from '@/lib/filter';
+import type { PublicListing } from '@/lib/types';
+
+export function MarketplaceDashboard() {
+  const [listings, setListings] = useState<PublicListing[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState<MarketplaceFilters>(EMPTY_FILTERS);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    getPublishedListings()
+      .then(setListings)
+      .finally(() => setLoading(false));
+  }, []);
+
+  const locations = useMemo(() => deriveLocations(listings), [listings]);
+  const types = useMemo(() => deriveTypes(listings), [listings]);
+  const amenities = useMemo(() => deriveAmenities(listings), [listings]);
+
+  const filtered = useMemo(() => applyFilters(listings, filters), [listings, filters]);
+
+  // Keep a valid selection: default to the first filtered result.
+  const selected =
+    filtered.find(l => l.id === selectedId) ?? filtered[0] ?? null;
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <div className="mx-auto max-w-[1440px] px-4 py-6 sm:px-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[260px_1fr] xl:grid-cols-[260px_1fr_400px]">
+          {/* Filters */}
+          <aside className="lg:sticky lg:top-20 lg:self-start">
+            <FilterSidebar
+              filters={filters}
+              onChange={setFilters}
+              locations={locations}
+              types={types}
+              amenities={amenities}
+            />
+          </aside>
+
+          {/* Listing grid */}
+          <div>
+            <div className="mb-4 flex items-baseline justify-between">
+              <h1 className="text-xl font-bold text-slate-900">Browse properties</h1>
+              {!loading && (
+                <p className="text-sm text-slate-500">{filtered.length} results</p>
+              )}
+            </div>
+
+            {loading ? (
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="aspect-[4/3] animate-pulse rounded-2xl bg-slate-200" />
+                ))}
+              </div>
+            ) : filtered.length === 0 ? (
+              <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white py-20 text-center">
+                <SearchX className="mb-3 h-10 w-10 text-slate-300" />
+                <p className="font-medium text-slate-700">No properties match your filters</p>
+                <button
+                  type="button"
+                  onClick={() => setFilters(EMPTY_FILTERS)}
+                  className="mt-2 text-sm font-medium text-blue-600 hover:underline"
+                >
+                  Clear all filters
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                {filtered.map(listing => (
+                  <ListingCard
+                    key={listing.id}
+                    listing={listing}
+                    selected={selected?.id === listing.id}
+                    onSelect={l => setSelectedId(l.id)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Detail panel */}
+          <aside className="lg:col-span-2 xl:col-span-1 xl:sticky xl:top-20 xl:self-start">
+            {selected ? (
+              <DetailPanel listing={selected} permalink={`/listing/${selected.id}`} />
+            ) : (
+              !loading && (
+                <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-10 text-center text-sm text-slate-400">
+                  Select a property to see details
+                </div>
+              )
+            )}
+          </aside>
+        </div>
+      </div>
+    </div>
+  );
+}

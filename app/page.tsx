@@ -13,9 +13,9 @@ export default async function HomePage() {
   return (
     <>
       {/* Hero */}
-      <section className="bg-gradient-to-br from-indigo-50 via-white to-slate-50 py-20 text-center">
+      <section className="bg-gradient-to-br from-blue-50 via-white to-slate-50 py-20 text-center">
         <div className="mx-auto max-w-3xl px-4">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-indigo-100 px-4 py-1.5 text-sm font-medium text-indigo-700">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-1.5 text-sm font-medium text-blue-700">
             <Building2 className="h-4 w-4" />
             Properties published by verified owners
           </div>
@@ -27,7 +27,7 @@ export default async function HomePage() {
             listed directly by property owners.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Button asChild size="lg">
+            <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700">
               <Link href="/listings">
                 Browse all listings <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
@@ -48,7 +48,7 @@ export default async function HomePage() {
           {allListings.length > 6 && (
             <Link
               href="/listings"
-              className="flex items-center gap-1 text-sm text-indigo-600 hover:underline"
+              className="flex items-center gap-1 text-sm text-blue-600 hover:underline"
             >
               View all {allListings.length} <ArrowRight className="h-3.5 w-3.5" />
             </Link>

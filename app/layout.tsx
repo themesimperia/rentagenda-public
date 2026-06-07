@@ -20,7 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className={`${inter.className} bg-white text-slate-900 antialiased`}>
         <Header />
-        <main className="min-h-[calc(100vh-56px-theme(spacing.16))]">{children}</main>
+        <main className="min-h-[calc(100vh-4rem)]">{children}</main>
         <Footer />
       </body>
     </html>
