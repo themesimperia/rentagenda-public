@@ -19,11 +19,10 @@ export function Header() {
           >
             Browse listings
           </Link>
-          <Button
-            size="sm"
-            onClick={() => window.open('https://rent-agenda.vercel.app', '_blank')}
-          >
-            List your property
+          <Button asChild size="sm">
+            <a href="https://rent-agenda.vercel.app" target="_blank" rel="noopener noreferrer">
+              List your property
+            </a>
           </Button>
         </nav>
       </div>
