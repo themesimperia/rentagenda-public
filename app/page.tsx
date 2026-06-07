@@ -4,7 +4,9 @@ import { FeaturedProperties } from '@/components/FeaturedProperties';
 import { getPublishedListings } from '@/lib/firestore';
 import { deriveLocations } from '@/lib/filter';
 
-export const revalidate = 60;
+// Always render fresh so newly published / delisted listings reflect
+// immediately rather than waiting on an ISR cache window.
+export const dynamic = 'force-dynamic';
 
 // Background photo (CSS background — no next/image remote config needed).
 const HERO_BG =
