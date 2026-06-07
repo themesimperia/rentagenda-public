@@ -142,7 +142,8 @@ function FeaturedCard({ listing }: { listing: PublicListing }) {
 
 export function FeaturedProperties({ listings }: { listings: PublicListing[] }) {
   const types = useMemo(() => deriveTypes(listings), [listings]);
-  const [active, setActive] = useState<PropertyType | null>(types[0] ?? null);
+  // `null` = the "All" tab (default), so newly published listings always show.
+  const [active, setActive] = useState<PropertyType | null>(null);
   const scroller = useRef<HTMLDivElement>(null);
 
   const shown = useMemo(
@@ -166,6 +167,15 @@ export function FeaturedProperties({ listings }: { listings: PublicListing[] }) 
 
         <div className="mt-8 flex items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setActive(null)}
+              className={`rounded-lg px-5 py-2 text-sm font-medium transition-colors ${
+                active === null ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              All
+            </button>
             {types.map(t => (
               <button
                 key={t}

@@ -4,7 +4,7 @@ import { FeaturedProperties } from '@/components/FeaturedProperties';
 import { getPublishedListings } from '@/lib/firestore';
 import { deriveLocations } from '@/lib/filter';
 
-export const revalidate = 300;
+export const revalidate = 60;
 
 // Background photo (CSS background — no next/image remote config needed).
 const HERO_BG =
