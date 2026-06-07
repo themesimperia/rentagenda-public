@@ -23,6 +23,8 @@ export interface PublicListing {
   photos: string[];
   owner_name?: string | null;
   owner_avatar?: string | null;
+  /** ISO date (YYYY-MM-DD) the unit frees up; null/absent = available now. */
+  available_from?: string | null;
   status: 'published' | 'unpublished';
   availability_summary: null;
   created_at: Timestamp;

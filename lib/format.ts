@@ -35,3 +35,29 @@ export function mapEmbedUrl(lat: number, lng: number): string {
   const d = 0.01;
   return `https://www.openstreetmap.org/export/embed.html?bbox=${lng - d},${lat - d},${lng + d},${lat + d}&layer=mapnik&marker=${lat},${lng}`;
 }
+
+export interface Availability {
+  available: boolean;
+  label: string;
+  /** 'green' = available now, 'amber' = occupied until a future date. */
+  tone: 'green' | 'amber';
+}
+
+/**
+ * Interprets a listing's `available_from` date into a display badge.
+ * A null/absent or past date means the unit is available now.
+ */
+export function availability(availableFrom?: string | null): Availability {
+  if (availableFrom) {
+    const ts = new Date(availableFrom).getTime();
+    if (!Number.isNaN(ts) && ts > Date.now()) {
+      const label = new Date(ts).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      });
+      return { available: false, label: `Available ${label}`, tone: 'amber' };
+    }
+  }
+  return { available: true, label: 'Available now', tone: 'green' };
+}

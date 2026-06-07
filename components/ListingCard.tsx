@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { MapPin, Bookmark, Bed, Bath, Maximize2 } from 'lucide-react';
-import { propertyTypeLabel, formatPrice } from '@/lib/format';
+import { propertyTypeLabel, formatPrice, availability } from '@/lib/format';
 import type { PublicListing } from '@/lib/types';
 
 interface ListingCardProps {
@@ -15,6 +15,7 @@ interface ListingCardProps {
 
 export function ListingCard({ listing, onSelect, selected, href }: ListingCardProps) {
   const photo = listing.photos[0];
+  const avail = availability(listing.available_from);
 
   const card = (
     <div
@@ -37,6 +38,15 @@ export function ListingCard({ listing, onSelect, selected, href }: ListingCardPr
       {/* Category badge */}
       <span className="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-slate-700 shadow-sm backdrop-blur">
         {propertyTypeLabel(listing.property_type)}
+      </span>
+
+      {/* Availability badge */}
+      <span
+        className={`absolute right-3 top-3 rounded-full bg-white/95 px-2.5 py-1 text-xs font-semibold shadow-sm backdrop-blur ${
+          avail.tone === 'green' ? 'text-emerald-600' : 'text-amber-600'
+        }`}
+      >
+        {avail.label}
       </span>
 
       {/* Floating info card */}

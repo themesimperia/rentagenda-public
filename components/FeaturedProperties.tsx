@@ -6,7 +6,7 @@ import Link from 'next/link';
 import {
   MapPin, Bed, Bath, Maximize2, ChevronLeft, ChevronRight, Eye,
 } from 'lucide-react';
-import { propertyTypeLabel, formatPrice } from '@/lib/format';
+import { propertyTypeLabel, formatPrice, availability } from '@/lib/format';
 import { deriveTypes } from '@/lib/filter';
 import type { PublicListing, PropertyType } from '@/lib/types';
 
@@ -65,6 +65,19 @@ function TermBadge({ listing }: { listing: PublicListing }) {
   );
 }
 
+function AvailabilityBadge({ listing }: { listing: PublicListing }) {
+  const a = availability(listing.available_from);
+  return (
+    <span
+      className={`absolute right-3 top-3 rounded-full px-2.5 py-1 text-xs font-semibold shadow-sm ${
+        a.tone === 'green' ? 'bg-white/95 text-emerald-600' : 'bg-white/95 text-amber-600'
+      }`}
+    >
+      {a.label}
+    </span>
+  );
+}
+
 function FeaturedCard({ listing }: { listing: PublicListing }) {
   const photo = listing.photos[0];
   return (
@@ -85,6 +98,7 @@ function FeaturedCard({ listing }: { listing: PublicListing }) {
           <div className="flex h-full items-center justify-center text-slate-400">No photo</div>
         )}
         <TermBadge listing={listing} />
+        <AvailabilityBadge listing={listing} />
       </div>
 
       <div className="p-4">

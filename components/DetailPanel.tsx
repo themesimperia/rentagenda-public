@@ -3,13 +3,17 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import {
-  MapPin, Bed, Bath, Maximize2, Home, CheckCircle2, CalendarClock, X,
+  MapPin, Bed, Bath, Maximize2, Home, CheckCircle2, CalendarClock, CalendarCheck, X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PhotoGallery } from '@/components/PhotoGallery';
 import { InquiryForm } from '@/components/InquiryForm';
-import { propertyTypeLabel, termLabel, formatPrice, mapEmbedUrl } from '@/lib/format';
+import { propertyTypeLabel, termLabel, formatPrice, mapEmbedUrl, availability } from '@/lib/format';
 import type { PublicListing } from '@/lib/types';
+
+function initials(name: string): string {
+  return name.split(/\s+/).slice(0, 2).map(w => w[0]?.toUpperCase() ?? '').join('');
+}
 
 type Tab = 'overview' | 'about';
 
@@ -32,6 +36,8 @@ export function DetailPanel({
 }) {
   const [tab, setTab] = useState<Tab>('overview');
   const [inquiryOpen, setInquiryOpen] = useState(false);
+  const avail = availability(listing.available_from);
+  const ownerName = listing.owner_name?.trim();
 
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
@@ -62,6 +68,40 @@ export function DetailPanel({
             {formatPrice(listing.price, listing.currency)}
             <span className="block text-xs font-normal text-slate-400">/month</span>
           </p>
+        </div>
+
+        {/* Availability */}
+        <div
+          className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium ${
+            avail.tone === 'green' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
+          }`}
+        >
+          {avail.tone === 'green' ? (
+            <CalendarCheck className="h-4 w-4 shrink-0" />
+          ) : (
+            <CalendarClock className="h-4 w-4 shrink-0" />
+          )}
+          {avail.available
+            ? 'Available now'
+            : `Currently occupied — ${avail.label.replace('Available ', 'free from ')}`}
+        </div>
+
+        {/* Owner */}
+        <div className="flex items-center gap-3 rounded-lg border border-slate-100 bg-slate-50 px-3 py-2.5">
+          {listing.owner_avatar ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={listing.owner_avatar} alt={ownerName || 'Owner'} className="h-9 w-9 rounded-full object-cover" />
+          ) : (
+            <span className="grid h-9 w-9 place-items-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700">
+              {ownerName ? initials(ownerName) : 'PO'}
+            </span>
+          )}
+          <div className="min-w-0">
+            <p className="text-xs text-slate-400">Listed by</p>
+            <p className="truncate text-sm font-semibold text-slate-700">
+              {ownerName || 'Property owner'}
+            </p>
+          </div>
         </div>
 
         {/* Tabs */}
