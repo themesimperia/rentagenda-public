@@ -19,7 +19,7 @@ const LINKS = {
 
 export function Footer() {
   return (
-    <footer className="bg-[#52555c] text-slate-300">
+    <footer className="bg-slate-900 text-slate-400">
       {/* Main grid */}
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr]">
@@ -94,14 +94,14 @@ export function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t border-[#3e4148]">
+      <div className="border-t border-slate-800">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-5 sm:flex-row sm:px-6">
           <p className="text-xs text-slate-400">
             © {new Date().getFullYear()} RentAgenda. All rights reserved.
           </p>
           <div className="flex items-center gap-4 text-xs text-slate-400">
             <Link href="/" className="transition-colors hover:text-white">Terms &amp; Conditions</Link>
-            <span className="text-slate-500">·</span>
+            <span className="text-slate-400">·</span>
             <Link href="/" className="transition-colors hover:text-white">Privacy Policy</Link>
           </div>
         </div>
