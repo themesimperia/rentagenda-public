@@ -168,11 +168,6 @@ export function ListingDetail({ listing }: { listing: PublicListing }) {
               </div>
             )}
 
-            {/* Map */}
-            <div>
-              <h2 className="mb-3 text-base font-semibold text-slate-800">Location</h2>
-              <PropertyMap lat={listing.lat} lng={listing.lng} address={listing.address_public} height={380} />
-            </div>
           </div>
 
           {/* ── Right: price + CTA (sticky) ───────────────────────────── */}
@@ -266,6 +261,12 @@ export function ListingDetail({ listing }: { listing: PublicListing }) {
             </div>
           </aside>
 
+        </div>
+
+        {/* ── Full-width map ────────────────────────────────────────── */}
+        <div className="mt-2">
+          <h2 className="mb-3 text-base font-semibold text-slate-800">Location</h2>
+          <PropertyMap lat={listing.lat} lng={listing.lng} address={listing.address_public} height={400} />
         </div>
       </div>
     </div>
