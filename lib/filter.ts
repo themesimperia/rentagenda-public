@@ -10,6 +10,7 @@ export interface MarketplaceFilters {
   priceMax: number | null;
   sizeMin: number | null;
   sizeMax: number | null;
+  bedroomsMin: number | null;
 }
 
 export const EMPTY_FILTERS: MarketplaceFilters = {
@@ -22,6 +23,7 @@ export const EMPTY_FILTERS: MarketplaceFilters = {
   priceMax: null,
   sizeMin: null,
   sizeMax: null,
+  bedroomsMin: null,
 };
 
 export function applyFilters(
@@ -41,6 +43,7 @@ export function applyFilters(
     if (f.priceMax != null && (l.price == null || l.price > f.priceMax)) return false;
     if (f.sizeMin != null && (l.size_sqm == null || l.size_sqm < f.sizeMin)) return false;
     if (f.sizeMax != null && (l.size_sqm == null || l.size_sqm > f.sizeMax)) return false;
+    if (f.bedroomsMin != null && (l.bedrooms == null || l.bedrooms < f.bedroomsMin)) return false;
     if (f.amenities.length && !f.amenities.every(a => l.amenities.includes(a))) return false;
     return true;
   });
@@ -79,6 +82,7 @@ export function isFiltered(f: MarketplaceFilters): boolean {
     f.priceMin != null ||
     f.priceMax != null ||
     f.sizeMin != null ||
-    f.sizeMax != null
+    f.sizeMax != null ||
+    f.bedroomsMin != null
   );
 }

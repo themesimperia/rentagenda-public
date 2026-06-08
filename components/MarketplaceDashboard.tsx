@@ -5,6 +5,7 @@ import { SearchX } from 'lucide-react';
 import { FilterSidebar } from '@/components/FilterSidebar';
 import { ListingCard } from '@/components/ListingCard';
 import { DetailPanel } from '@/components/DetailPanel';
+import { BrowseTopBar, type SortBy, type ViewMode } from '@/components/BrowseTopBar';
 import { getPublishedListings } from '@/lib/firestore';
 import {
   type MarketplaceFilters,
@@ -15,6 +16,18 @@ import {
   deriveAmenities,
 } from '@/lib/filter';
 import type { PublicListing } from '@/lib/types';
+
+function sortListings(listings: PublicListing[], sortBy: SortBy): PublicListing[] {
+  const arr = [...listings];
+  if (sortBy === 'newest') {
+    arr.sort((a, b) => (b.published_at ?? 0) - (a.published_at ?? 0));
+  } else if (sortBy === 'price_asc') {
+    arr.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
+  } else if (sortBy === 'price_desc') {
+    arr.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
+  }
+  return arr;
+}
 
 export function MarketplaceDashboard({
   initialFilters,
@@ -28,6 +41,8 @@ export function MarketplaceDashboard({
     ...initialFilters,
   });
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<SortBy>('relevant');
+  const [view, setView] = useState<ViewMode>('grid');
 
   useEffect(() => {
     getPublishedListings()
@@ -39,9 +54,11 @@ export function MarketplaceDashboard({
   const types = useMemo(() => deriveTypes(listings), [listings]);
   const amenities = useMemo(() => deriveAmenities(listings), [listings]);
 
-  const filtered = useMemo(() => applyFilters(listings, filters), [listings, filters]);
+  const filtered = useMemo(
+    () => sortListings(applyFilters(listings, filters), sortBy),
+    [listings, filters, sortBy],
+  );
 
-  // Keep a valid selection: default to the first filtered result.
   const selected =
     filtered.find(l => l.id === selectedId) ?? filtered[0] ?? null;
 
@@ -49,7 +66,8 @@ export function MarketplaceDashboard({
     <div className="min-h-screen bg-slate-50">
       <div className="px-4 py-6 sm:px-6">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[260px_1fr] xl:grid-cols-[260px_1fr_420px]">
-          {/* Filters */}
+
+          {/* ── Sidebar filters ──────────────────────────────────── */}
           <aside className="lg:sticky lg:top-20 lg:self-start">
             <FilterSidebar
               filters={filters}
@@ -60,15 +78,24 @@ export function MarketplaceDashboard({
             />
           </aside>
 
-          {/* Listing grid */}
-          <div>
-            <div className="mb-4 flex items-baseline justify-between">
-              <h1 className="text-xl font-bold text-slate-900">Browse properties</h1>
-              {!loading && (
-                <p className="text-sm text-slate-500">{filtered.length} results</p>
-              )}
-            </div>
+          {/* ── Listing area ─────────────────────────────────────── */}
+          <div className="space-y-4">
+            {/* Page title */}
+            <h1 className="text-xl font-bold text-slate-900">Browse properties</h1>
 
+            {/* Top filter bar */}
+            <BrowseTopBar
+              filters={filters}
+              onFiltersChange={setFilters}
+              resultCount={filtered.length}
+              loading={loading}
+              sortBy={sortBy}
+              onSortChange={setSortBy}
+              view={view}
+              onViewChange={setView}
+            />
+
+            {/* Grid / list */}
             {loading ? (
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 {Array.from({ length: 6 }).map((_, i) => (
@@ -87,8 +114,20 @@ export function MarketplaceDashboard({
                   Clear all filters
                 </button>
               </div>
-            ) : (
+            ) : view === 'grid' ? (
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                {filtered.map(listing => (
+                  <ListingCard
+                    key={listing.id}
+                    listing={listing}
+                    selected={selected?.id === listing.id}
+                    onSelect={l => setSelectedId(l.id)}
+                  />
+                ))}
+              </div>
+            ) : (
+              /* List view — single column with more info */
+              <div className="space-y-3">
                 {filtered.map(listing => (
                   <ListingCard
                     key={listing.id}
@@ -101,7 +140,7 @@ export function MarketplaceDashboard({
             )}
           </div>
 
-          {/* Detail panel */}
+          {/* ── Detail panel ─────────────────────────────────────── */}
           <aside className="lg:col-span-2 xl:col-span-1 xl:sticky xl:top-20 xl:self-start">
             {selected ? (
               <DetailPanel listing={selected} permalink={`/listing/${selected.id}`} />
