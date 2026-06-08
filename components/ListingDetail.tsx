@@ -171,7 +171,7 @@ export function ListingDetail({ listing }: { listing: PublicListing }) {
             {/* Map */}
             <div>
               <h2 className="mb-3 text-base font-semibold text-slate-800">Location</h2>
-              <PropertyMap lat={listing.lat} lng={listing.lng} address={listing.address_public} />
+              <PropertyMap lat={listing.lat} lng={listing.lng} address={listing.address_public} height={380} />
             </div>
           </div>
 

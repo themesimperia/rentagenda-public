@@ -8,9 +8,10 @@ interface PropertyMapProps {
   lat: number | null;
   lng: number | null;
   address: string;
+  height?: number;
 }
 
-export function PropertyMap({ lat, lng, address }: PropertyMapProps) {
+export function PropertyMap({ lat, lng, address, height = 200 }: PropertyMapProps) {
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(
     lat != null && lng != null ? { lat, lng } : null,
   );
@@ -43,7 +44,7 @@ export function PropertyMap({ lat, lng, address }: PropertyMapProps) {
     <div>
       <div className="overflow-hidden rounded-xl border border-slate-200">
         {loading ? (
-          <div className="flex h-[200px] items-center justify-center bg-slate-50">
+          <div className="flex items-center justify-center bg-slate-50" style={{ height }}>
             <div className="h-5 w-5 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
           </div>
         ) : coords ? (
@@ -51,12 +52,12 @@ export function PropertyMap({ lat, lng, address }: PropertyMapProps) {
             title="Approximate location"
             src={mapEmbedUrl(coords.lat, coords.lng)}
             width="100%"
-            height="200"
+            height={height}
             className="border-0"
             loading="lazy"
           />
         ) : (
-          <div className="flex h-[200px] flex-col items-center justify-center gap-2 bg-slate-50 text-slate-400">
+          <div className="flex flex-col items-center justify-center gap-2 bg-slate-50 text-slate-400" style={{ height }}>
             <MapPin className="h-8 w-8 text-slate-300" />
             <span className="text-sm">Map not available</span>
           </div>
