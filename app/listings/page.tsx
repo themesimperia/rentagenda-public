@@ -24,6 +24,9 @@ export default async function ListingsPage({
   const sp = await searchParams;
   const initial: Partial<MarketplaceFilters> = {};
 
+  const q = one(sp.q);
+  if (q) initial.search = q;
+
   const type = one(sp.type);
   if (type && PROPERTY_TYPES.includes(type as PropertyType)) {
     initial.types = [type as PropertyType];
