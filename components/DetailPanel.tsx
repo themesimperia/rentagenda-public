@@ -4,12 +4,13 @@ import { useState } from 'react';
 import Link from 'next/link';
 import {
   MapPin, Bed, Bath, Maximize2, Home, CheckCircle2,
-  CalendarClock, CalendarCheck, X, ExternalLink,
+  CalendarClock, CalendarCheck, X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PhotoGallery } from '@/components/PhotoGallery';
 import { InquiryForm } from '@/components/InquiryForm';
-import { propertyTypeLabel, termLabel, formatPrice, mapEmbedUrl, availability } from '@/lib/format';
+import { propertyTypeLabel, termLabel, formatPrice, availability } from '@/lib/format';
+import { PropertyMap } from '@/components/PropertyMap';
 import type { PublicListing } from '@/lib/types';
 
 function initials(name: string): string {
@@ -38,7 +39,6 @@ export function DetailPanel({
   const [inquiryOpen, setInquiryOpen] = useState(false);
   const avail = availability(listing);
   const ownerName = listing.owner_name?.trim();
-  const hasMap = listing.lat != null && listing.lng != null;
 
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
@@ -250,40 +250,7 @@ export function DetailPanel({
         )}
 
         {/* ── Map ───────────────────────────────────────────────────────── */}
-        <div>
-          <div className="overflow-hidden rounded-xl border border-slate-200">
-            {hasMap ? (
-              <iframe
-                title="Approximate location"
-                src={mapEmbedUrl(listing.lat!, listing.lng!)}
-                width="100%"
-                height="200"
-                className="border-0"
-                loading="lazy"
-              />
-            ) : (
-              <div className="flex h-[200px] flex-col items-center justify-center gap-2 bg-slate-50 text-slate-400">
-                <MapPin className="h-8 w-8 text-slate-300" />
-                <span className="text-sm">Map not available</span>
-              </div>
-            )}
-          </div>
-          <div className="mt-1.5 flex items-center justify-between">
-            <p className="text-xs text-slate-400">
-              {hasMap ? 'Approximate location — exact address shared after inquiry.' : listing.address_public}
-            </p>
-            {listing.address_public && (
-              <a
-                href={`https://www.google.com/maps/search/${encodeURIComponent(listing.address_public)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1 text-xs text-blue-500 hover:underline"
-              >
-                Open in Maps <ExternalLink className="h-3 w-3" />
-              </a>
-            )}
-          </div>
-        </div>
+        <PropertyMap lat={listing.lat} lng={listing.lng} address={listing.address_public} />
       </div>
     </div>
   );
