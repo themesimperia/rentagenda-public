@@ -47,8 +47,8 @@ export function MarketplaceDashboard({
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="mx-auto max-w-[1440px] px-4 py-6 sm:px-6">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[260px_1fr] xl:grid-cols-[260px_1fr_400px]">
+      <div className="px-4 py-6 sm:px-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[260px_1fr] xl:grid-cols-[260px_1fr_420px]">
           {/* Filters */}
           <aside className="lg:sticky lg:top-20 lg:self-start">
             <FilterSidebar

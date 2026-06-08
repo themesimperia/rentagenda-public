@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Building2, Search, X } from 'lucide-react';
+import { Bell, Building2, MessageSquare, Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth-context';
 import { AuthModal } from '@/components/auth/AuthModal';
@@ -27,7 +27,7 @@ export function Header() {
     setAuthOpen(true);
   }
 
-  function submitSearch(e: React.FormEvent) {
+  function submitSearch(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const q = search.trim();
     router.push(q ? `/listings?q=${encodeURIComponent(q)}` : '/listings');
@@ -85,6 +85,28 @@ export function Header() {
               )}
             </div>
           </form>
+
+          {/* Icon buttons */}
+          <div className="hidden shrink-0 items-center gap-1 sm:flex">
+            <a
+              href="https://rent-agenda.vercel.app/Inquiries"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Messages"
+              className="grid h-9 w-9 place-items-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
+            >
+              <MessageSquare className="h-5 w-5" />
+            </a>
+            <a
+              href="https://rent-agenda.vercel.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Notifications"
+              className="grid h-9 w-9 place-items-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
+            >
+              <Bell className="h-5 w-5" />
+            </a>
+          </div>
 
           {/* Auth area */}
           <div className="flex shrink-0 items-center gap-2">
