@@ -86,14 +86,14 @@ export function Header() {
             </div>
           </form>
 
-          {/* Icon buttons */}
-          <div className="hidden shrink-0 items-center gap-1 sm:flex">
+          {/* Auth area + icons */}
+          <div className="flex shrink-0 items-center gap-1">
             <a
               href="https://rent-agenda.vercel.app/Inquiries"
               target="_blank"
               rel="noopener noreferrer"
               title="Messages"
-              className="grid h-9 w-9 place-items-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
+              className="hidden h-9 w-9 place-items-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 sm:grid"
             >
               <MessageSquare className="h-5 w-5" />
             </a>
@@ -102,14 +102,10 @@ export function Header() {
               target="_blank"
               rel="noopener noreferrer"
               title="Notifications"
-              className="grid h-9 w-9 place-items-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
+              className="hidden h-9 w-9 place-items-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 sm:grid"
             >
               <Bell className="h-5 w-5" />
             </a>
-          </div>
-
-          {/* Auth area */}
-          <div className="flex shrink-0 items-center gap-2">
             {loading ? (
               <div className="h-8 w-20 animate-pulse rounded-full bg-slate-100" />
             ) : user ? (
