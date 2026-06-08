@@ -1,26 +1,109 @@
 import Link from 'next/link';
 import { Building2 } from 'lucide-react';
 
+const LINKS = {
+  Marketplace: [
+    { label: 'Browse Listings', href: '/listings' },
+    { label: 'Home', href: '/' },
+  ],
+  Owners: [
+    { label: 'List Your Property', href: 'https://rent-agenda.vercel.app', external: true },
+    { label: 'Manage Properties', href: 'https://rent-agenda.vercel.app', external: true },
+    { label: 'View Inquiries', href: 'https://rent-agenda.vercel.app/Inquiries', external: true },
+  ],
+  Company: [
+    { label: 'About RentAgenda', href: '/' },
+    { label: 'Contact Us', href: '/' },
+  ],
+};
+
 export function Footer() {
   return (
-    <footer className="border-t bg-slate-50 mt-16">
-      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-2 text-slate-700 font-medium">
-            <Building2 className="h-4 w-4 text-indigo-600" />
-            RentAgenda Marketplace
-          </Link>
-          <p className="text-sm text-slate-500">
+    <footer className="bg-slate-900 text-slate-400">
+      {/* Main grid */}
+      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr]">
+
+          {/* Brand */}
+          <div className="space-y-4">
+            <Link href="/" className="inline-flex items-center gap-2 text-white">
+              <span className="grid h-8 w-8 place-items-center rounded-lg bg-blue-600">
+                <Building2 className="h-5 w-5 text-white" />
+              </span>
+              <span className="text-lg font-bold">RentAgenda</span>
+            </Link>
+            <p className="max-w-xs text-sm leading-relaxed">
+              Find your next home directly from verified property owners — no agents, no hidden fees.
+            </p>
+          </div>
+
+          {/* Link columns */}
+          {(Object.entries(LINKS) as [string, { label: string; href: string; external?: boolean }[]][]).map(
+            ([heading, items]) => (
+              <div key={heading}>
+                <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-slate-200">
+                  {heading}
+                </h3>
+                <ul className="space-y-2.5">
+                  {items.map(item => (
+                    <li key={item.label}>
+                      {item.external ? (
+                        <a
+                          href={item.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm transition-colors hover:text-white"
+                        >
+                          {item.label}
+                        </a>
+                      ) : (
+                        <Link href={item.href} className="text-sm transition-colors hover:text-white">
+                          {item.label}
+                        </Link>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ),
+          )}
+
+          {/* CTA column */}
+          <div className="space-y-3">
+            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-slate-200">
+              Ready to list?
+            </h3>
+            <a
+              href="https://rent-agenda.vercel.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full rounded-xl bg-blue-600 px-4 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+            >
+              List Your Property
+            </a>
+            <a
+              href="https://rent-agenda.vercel.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full rounded-xl border border-slate-600 px-4 py-3 text-center text-sm font-semibold text-slate-200 transition-colors hover:border-slate-400 hover:text-white"
+            >
+              Owner Dashboard
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom bar */}
+      <div className="border-t border-slate-800">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-5 sm:flex-row sm:px-6">
+          <p className="text-xs text-slate-500">
             © {new Date().getFullYear()} RentAgenda. All rights reserved.
           </p>
-          <a
-            href="https://rent-agenda.vercel.app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-indigo-600 hover:underline"
-          >
-            Manage your properties →
-          </a>
+          <div className="flex items-center gap-4 text-xs text-slate-500">
+            <Link href="/" className="transition-colors hover:text-slate-300">Terms &amp; Conditions</Link>
+            <span className="text-slate-700">·</span>
+            <Link href="/" className="transition-colors hover:text-slate-300">Privacy Policy</Link>
+          </div>
         </div>
       </div>
     </footer>
