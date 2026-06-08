@@ -9,10 +9,11 @@ interface PhotoGalleryProps {
   photos: string[];
   title: string;
   /**
-   * "row"   — main photo + 4-thumbnail row (default, used on listing page)
-   * "panel" — big photo left + 2 stacked thumbnails right (used in detail panel)
+   * "row"   — main photo + 4-thumbnail row (default)
+   * "panel" — big photo left + 2 stacked thumbnails right (detail side-panel)
+   * "page"  — big photo left + 2×2 thumbnail grid right (full listing page)
    */
-  variant?: 'row' | 'panel';
+  variant?: 'row' | 'panel' | 'page';
 }
 
 export function PhotoGallery({ photos, title, variant = 'row' }: PhotoGalleryProps) {
@@ -28,7 +29,52 @@ export function PhotoGallery({ photos, title, variant = 'row' }: PhotoGalleryPro
 
   return (
     <>
-      {variant === 'panel' ? (
+      {variant === 'page' ? (
+        /* ── Full-page hero: big left + 2×2 grid right ─────────────── */
+        <div className="grid h-[420px] grid-cols-[3fr_2fr] gap-2 overflow-hidden rounded-2xl">
+          {/* Main photo */}
+          <div
+            className="relative h-full cursor-pointer overflow-hidden bg-slate-100"
+            onClick={() => setLightbox(0)}
+          >
+            <Image
+              src={photos[0]}
+              alt={title}
+              fill
+              className="object-cover transition-opacity hover:opacity-95"
+              sizes="(max-width: 1280px) 60vw, 800px"
+              priority
+            />
+          </div>
+          {/* 2×2 thumbnail grid */}
+          <div className="grid grid-cols-2 grid-rows-2 gap-2">
+            {[1, 2, 3, 4].map(i => (
+              <div
+                key={i}
+                className="relative cursor-pointer overflow-hidden bg-slate-100"
+                onClick={() => setLightbox(Math.min(i, photos.length - 1))}
+              >
+                {photos[i] ? (
+                  <Image
+                    src={photos[i]}
+                    alt={`${title} ${i + 1}`}
+                    fill
+                    className="object-cover transition-opacity hover:opacity-95"
+                    sizes="15vw"
+                  />
+                ) : (
+                  <div className="h-full bg-slate-200" />
+                )}
+                {i === 3 && photos.length > 5 && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 text-sm font-semibold text-white">
+                    +{photos.length - 5} more
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : variant === 'panel' ? (
         <div className="grid h-56 grid-cols-[2fr_1fr] gap-1">
           {/* Main photo */}
           <div

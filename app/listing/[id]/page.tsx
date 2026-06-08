@@ -1,8 +1,6 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ChevronLeft } from 'lucide-react';
-import { DetailPanel } from '@/components/DetailPanel';
+import { ListingDetail } from '@/components/ListingDetail';
 import { getListing, getPublishedListings } from '@/lib/firestore';
 
 export const revalidate = 300;
@@ -52,17 +50,5 @@ export default async function ListingPage({
   const listing = await getListing(id);
   if (!listing) notFound();
 
-  return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
-        <Link
-          href="/listings"
-          className="mb-4 inline-flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-blue-600"
-        >
-          <ChevronLeft className="h-4 w-4" /> Back to all properties
-        </Link>
-        <DetailPanel listing={listing} />
-      </div>
-    </div>
-  );
+  return <ListingDetail listing={listing} />;
 }
