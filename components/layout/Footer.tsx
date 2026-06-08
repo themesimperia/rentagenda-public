@@ -19,7 +19,7 @@ const LINKS = {
 
 export function Footer() {
   return (
-    <footer className="bg-slate-900 text-slate-400">
+    <footer className="bg-blue-950 text-blue-300">
       {/* Main grid */}
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr]">
@@ -41,7 +41,7 @@ export function Footer() {
           {(Object.entries(LINKS) as [string, { label: string; href: string; external?: boolean }[]][]).map(
             ([heading, items]) => (
               <div key={heading}>
-                <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-slate-200">
+                <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-blue-100">
                   {heading}
                 </h3>
                 <ul className="space-y-2.5">
@@ -70,7 +70,7 @@ export function Footer() {
 
           {/* CTA column */}
           <div className="space-y-3">
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-slate-200">
+            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-blue-100">
               Ready to list?
             </h3>
             <a
@@ -85,7 +85,7 @@ export function Footer() {
               href="https://rent-agenda.vercel.app"
               target="_blank"
               rel="noopener noreferrer"
-              className="block w-full rounded-xl border border-slate-600 px-4 py-3 text-center text-sm font-semibold text-slate-200 transition-colors hover:border-slate-400 hover:text-white"
+              className="block w-full rounded-xl border border-blue-700 px-4 py-3 text-center text-sm font-semibold text-blue-100 transition-colors hover:border-blue-400 hover:text-white"
             >
               Owner Dashboard
             </a>
@@ -94,15 +94,15 @@ export function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t border-slate-800">
+      <div className="border-t border-blue-900">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-5 sm:flex-row sm:px-6">
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-blue-400">
             © {new Date().getFullYear()} RentAgenda. All rights reserved.
           </p>
-          <div className="flex items-center gap-4 text-xs text-slate-500">
-            <Link href="/" className="transition-colors hover:text-slate-300">Terms &amp; Conditions</Link>
-            <span className="text-slate-700">·</span>
-            <Link href="/" className="transition-colors hover:text-slate-300">Privacy Policy</Link>
+          <div className="flex items-center gap-4 text-xs text-blue-400">
+            <Link href="/" className="transition-colors hover:text-white">Terms &amp; Conditions</Link>
+            <span className="text-blue-800">·</span>
+            <Link href="/" className="transition-colors hover:text-white">Privacy Policy</Link>
           </div>
         </div>
       </div>
