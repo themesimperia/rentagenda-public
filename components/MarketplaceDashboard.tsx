@@ -35,7 +35,7 @@ export function MarketplaceDashboard({
   initialListings: PublicListing[];
   initialFilters?: Partial<MarketplaceFilters>;
 }) {
-  const [listings] = useState<PublicListing[]>(initialListings);
+  const listings = initialListings;
   const [filters, setFilters] = useState<MarketplaceFilters>({
     ...EMPTY_FILTERS,
     ...initialFilters,
@@ -133,11 +133,9 @@ export function MarketplaceDashboard({
             {selected ? (
               <DetailPanel listing={selected} permalink={`/listing/${selected.id}`} />
             ) : (
-              (
-                <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-10 text-center text-sm text-slate-400">
-                  Select a property to see details
-                </div>
-              )
+              <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-10 text-center text-sm text-slate-400">
+                Select a property to see details
+              </div>
             )}
           </aside>
         </div>
