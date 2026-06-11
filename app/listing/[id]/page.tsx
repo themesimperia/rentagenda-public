@@ -6,8 +6,13 @@ import { getListing, getPublishedListings } from '@/lib/firestore';
 export const revalidate = 300;
 
 export async function generateStaticParams() {
-  const listings = await getPublishedListings();
-  return listings.map(l => ({ id: l.id }));
+  try {
+    const listings = await getPublishedListings();
+    return listings.map(l => ({ id: l.id }));
+  } catch (err) {
+    console.error('generateStaticParams: failed to load listings, building with none:', err);
+    return [];
+  }
 }
 
 export async function generateMetadata({
