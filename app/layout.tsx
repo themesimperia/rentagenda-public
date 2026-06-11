@@ -8,6 +8,7 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://rentagenda-public.vercel.app'),
   title: {
     default: 'RentAgenda Marketplace — Find your next property',
     template: '%s | RentAgenda Marketplace',

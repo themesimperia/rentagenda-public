@@ -6,8 +6,13 @@ import { getListing, getPublishedListings } from '@/lib/firestore';
 export const revalidate = 300;
 
 export async function generateStaticParams() {
-  const listings = await getPublishedListings();
-  return listings.map(l => ({ id: l.id }));
+  try {
+    const listings = await getPublishedListings();
+    return listings.map(l => ({ id: l.id }));
+  } catch (err) {
+    console.error('generateStaticParams: failed to load listings, building with none:', err);
+    return [];
+  }
 }
 
 export async function generateMetadata({
@@ -50,5 +55,40 @@ export default async function ListingPage({
   const listing = await getListing(id);
   if (!listing) notFound();
 
-  return <ListingDetail listing={listing} />;
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Residence',
+    name: listing.title,
+    ...(listing.description ? { description: listing.description } : {}),
+    ...(listing.photos.length > 0 ? { image: listing.photos } : {}),
+    ...(listing.address_public
+      ? { address: { '@type': 'PostalAddress', addressLocality: listing.address_public } }
+      : {}),
+    ...(listing.lat != null && listing.lng != null
+      ? { geo: { '@type': 'GeoCoordinates', latitude: listing.lat, longitude: listing.lng } }
+      : {}),
+    ...(listing.price != null
+      ? {
+          offers: {
+            '@type': 'Offer',
+            price: listing.price,
+            priceCurrency: listing.currency,
+            availability:
+              listing.availability_status === 'occupied'
+                ? 'https://schema.org/OutOfStock'
+                : 'https://schema.org/InStock',
+          },
+        }
+      : {}),
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <ListingDetail listing={listing} />
+    </>
+  );
 }

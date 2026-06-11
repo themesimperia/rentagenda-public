@@ -11,6 +11,7 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 import type { PublicListing, InquiryFormData } from './types';
+import { cache } from 'react';
 
 /** Firestore Timestamp (or anything) -> epoch millis, so listings are plain
  * serializable objects safe to pass from Server to Client Components. */
@@ -25,13 +26,15 @@ function toListing(id: string, data: DocumentData): PublicListing {
   return {
     ...data,
     id,
+    photos: Array.isArray(data.photos) ? data.photos : [],
+    amenities: Array.isArray(data.amenities) ? data.amenities : [],
     created_at: toMillis(data.created_at),
     published_at: toMillis(data.published_at),
     updated_at: toMillis(data.updated_at),
   } as PublicListing;
 }
 
-export async function getPublishedListings(): Promise<PublicListing[]> {
+export const getPublishedListings = cache(async (): Promise<PublicListing[]> => {
   const q = query(
     collection(db, 'public_listings'),
     where('status', '==', 'published')
@@ -39,15 +42,15 @@ export async function getPublishedListings(): Promise<PublicListing[]> {
   const snap = await getDocs(q);
   const listings = snap.docs.map(d => toListing(d.id, d.data()));
   return listings.sort((a, b) => (b.published_at ?? 0) - (a.published_at ?? 0));
-}
+});
 
-export async function getListing(id: string): Promise<PublicListing | null> {
+export const getListing = cache(async (id: string): Promise<PublicListing | null> => {
   const snap = await getDoc(doc(db, 'public_listings', id));
   if (!snap.exists()) return null;
   const data = snap.data();
   if (data.status !== 'published') return null;
   return toListing(snap.id, data);
-}
+});
 
 export async function createInquiry(
   listing: PublicListing,

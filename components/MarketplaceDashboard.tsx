@@ -1,12 +1,11 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { SearchX } from 'lucide-react';
 import { FilterSidebar } from '@/components/FilterSidebar';
 import { ListingCard } from '@/components/ListingCard';
 import { DetailPanel } from '@/components/DetailPanel';
 import { BrowseTopBar, type SortBy, type ViewMode } from '@/components/BrowseTopBar';
-import { getPublishedListings } from '@/lib/firestore';
 import {
   type MarketplaceFilters,
   EMPTY_FILTERS,
@@ -30,12 +29,13 @@ function sortListings(listings: PublicListing[], sortBy: SortBy): PublicListing[
 }
 
 export function MarketplaceDashboard({
+  initialListings,
   initialFilters,
 }: {
+  initialListings: PublicListing[];
   initialFilters?: Partial<MarketplaceFilters>;
 }) {
-  const [listings, setListings] = useState<PublicListing[]>([]);
-  const [loading, setLoading] = useState(true);
+  const listings = initialListings;
   const [filters, setFilters] = useState<MarketplaceFilters>({
     ...EMPTY_FILTERS,
     ...initialFilters,
@@ -43,12 +43,6 @@ export function MarketplaceDashboard({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<SortBy>('relevant');
   const [view, setView] = useState<ViewMode>('grid');
-
-  useEffect(() => {
-    getPublishedListings()
-      .then(setListings)
-      .finally(() => setLoading(false));
-  }, []);
 
   const locations = useMemo(() => deriveLocations(listings), [listings]);
   const types = useMemo(() => deriveTypes(listings), [listings]);
@@ -88,7 +82,7 @@ export function MarketplaceDashboard({
               filters={filters}
               onFiltersChange={setFilters}
               resultCount={filtered.length}
-              loading={loading}
+              loading={false}
               sortBy={sortBy}
               onSortChange={setSortBy}
               view={view}
@@ -96,13 +90,7 @@ export function MarketplaceDashboard({
             />
 
             {/* Grid / list */}
-            {loading ? (
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="aspect-[4/3] animate-pulse rounded-2xl bg-slate-200" />
-                ))}
-              </div>
-            ) : filtered.length === 0 ? (
+            {filtered.length === 0 ? (
               <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white py-20 text-center">
                 <SearchX className="mb-3 h-10 w-10 text-slate-300" />
                 <p className="font-medium text-slate-700">No properties match your filters</p>
@@ -145,11 +133,9 @@ export function MarketplaceDashboard({
             {selected ? (
               <DetailPanel listing={selected} permalink={`/listing/${selected.id}`} />
             ) : (
-              !loading && (
-                <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-10 text-center text-sm text-slate-400">
-                  Select a property to see details
-                </div>
-              )
+              <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-10 text-center text-sm text-slate-400">
+                Select a property to see details
+              </div>
             )}
           </aside>
         </div>
