@@ -65,9 +65,7 @@ export function PropertyMap({ lat, lng, address, height = 200 }: PropertyMapProp
       </div>
       <div className="mt-1.5 flex items-center justify-between">
         <p className="text-xs text-slate-400">
-          {coords
-            ? 'Approximate location — exact address shared after inquiry.'
-            : address || 'No address provided.'}
+          {coords ? 'Property location' : address || 'No address provided.'}
         </p>
         {address && (
           <a
