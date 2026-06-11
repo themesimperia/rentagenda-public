@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
 import { MarketplaceDashboard } from '@/components/MarketplaceDashboard';
+import { getPublishedListings } from '@/lib/firestore';
 import type { MarketplaceFilters } from '@/lib/filter';
 import type { PropertyType, RentalTerm } from '@/lib/types';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Browse properties',
@@ -46,5 +49,7 @@ export default async function ListingsPage({
   const priceMax = one(sp.priceMax);
   if (priceMax && !Number.isNaN(Number(priceMax))) initial.priceMax = Number(priceMax);
 
-  return <MarketplaceDashboard initialFilters={initial} />;
+  const listings = await getPublishedListings();
+
+  return <MarketplaceDashboard initialListings={listings} initialFilters={initial} />;
 }
