@@ -2,15 +2,19 @@ import {
   collection,
   query,
   where,
+  orderBy,
   getDocs,
   getDoc,
   doc,
   addDoc,
+  setDoc,
+  deleteDoc,
   serverTimestamp,
   type DocumentData,
 } from 'firebase/firestore';
 import { db } from './firebase';
 import type { PublicListing, InquiryFormData } from './types';
+import { buildSavedSnapshot, type SavedListing } from './saved-listings';
 import { cache } from 'react';
 
 /** Firestore Timestamp (or anything) -> epoch millis, so listings are plain
@@ -68,4 +72,41 @@ export async function createInquiry(
     status: 'new',
     source: 'public_site',
   });
+}
+
+/** Listing IDs the user has saved (lightweight — for the save-state Set). */
+export async function getSavedListingIds(uid: string): Promise<string[]> {
+  const snap = await getDocs(collection(db, 'users', uid, 'saved_listings'));
+  return snap.docs.map(d => d.id);
+}
+
+/** Full saved-listing snapshot docs, newest first (for the dashboard). */
+export async function getSavedListings(uid: string): Promise<SavedListing[]> {
+  const q = query(
+    collection(db, 'users', uid, 'saved_listings'),
+    orderBy('saved_at', 'desc'),
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map(d => {
+    const data = d.data();
+    return {
+      listing_id: d.id,
+      title: data.title ?? '',
+      thumbnail: data.thumbnail ?? null,
+      price_at_save: data.price_at_save ?? null,
+      currency: data.currency ?? 'EUR',
+      saved_at: toMillis(data.saved_at),
+    };
+  });
+}
+
+export async function saveListing(uid: string, listing: PublicListing): Promise<void> {
+  await setDoc(doc(db, 'users', uid, 'saved_listings', listing.id), {
+    ...buildSavedSnapshot(listing),
+    saved_at: serverTimestamp(),
+  });
+}
+
+export async function unsaveListing(uid: string, listingId: string): Promise<void> {
+  await deleteDoc(doc(db, 'users', uid, 'saved_listings', listingId));
 }
