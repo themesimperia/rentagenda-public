@@ -6,6 +6,7 @@ import { FilterSidebar } from '@/components/FilterSidebar';
 import { ListingCard } from '@/components/ListingCard';
 import { DetailPanel } from '@/components/DetailPanel';
 import { BrowseTopBar, type SortBy, type ViewMode } from '@/components/BrowseTopBar';
+import { FilterBar } from '@/components/FilterBar';
 import {
   type MarketplaceFilters,
   EMPTY_FILTERS,
@@ -77,6 +78,15 @@ export function MarketplaceDashboard({
           <div className="space-y-4">
             {/* Page title */}
             <h1 className="text-xl font-bold text-slate-900">Browse properties</h1>
+
+            {/* Horizontal filter bar (deferred — commits on Apply) */}
+            <FilterBar
+              value={filters}
+              onApply={setFilters}
+              locations={locations}
+              types={types}
+              amenities={amenities}
+            />
 
             {/* Top filter bar */}
             <BrowseTopBar
