@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Building2 } from 'lucide-react';
+import { OWNER_APP_URL } from '@/lib/config';
 
 const LINKS = {
   Marketplace: [
@@ -7,9 +8,9 @@ const LINKS = {
     { label: 'Home', href: '/' },
   ],
   Owners: [
-    { label: 'List Your Property', href: 'https://rent-agenda.vercel.app', external: true },
-    { label: 'Manage Properties', href: 'https://rent-agenda.vercel.app', external: true },
-    { label: 'View Inquiries', href: 'https://rent-agenda.vercel.app/Inquiries', external: true },
+    { label: 'List Your Property', href: OWNER_APP_URL, external: true },
+    { label: 'Manage Properties', href: OWNER_APP_URL, external: true },
+    { label: 'View Inquiries', href: `${OWNER_APP_URL}/Inquiries`, external: true },
   ],
   Company: [
     { label: 'About RentAgenda', href: '/' },
@@ -74,7 +75,7 @@ export function Footer() {
               Ready to list?
             </h3>
             <a
-              href="https://rent-agenda.vercel.app"
+              href={OWNER_APP_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="block w-full rounded-xl bg-blue-600 px-4 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-blue-700"
@@ -82,7 +83,7 @@ export function Footer() {
               List Your Property
             </a>
             <a
-              href="https://rent-agenda.vercel.app"
+              href={OWNER_APP_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="block w-full rounded-xl border border-slate-500 px-4 py-3 text-center text-sm font-semibold text-white transition-colors hover:border-slate-300 hover:text-white"

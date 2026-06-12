@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { X, ChevronDown, LayoutGrid, List } from 'lucide-react';
-import { type MarketplaceFilters, EMPTY_FILTERS } from '@/lib/filter';
+import { type MarketplaceFilters, EMPTY_FILTERS, isFiltered } from '@/lib/filter';
 
 export type SortBy = 'relevant' | 'newest' | 'price_asc' | 'price_desc';
 export type ViewMode = 'grid' | 'list';
@@ -89,7 +89,7 @@ export function BrowseTopBar({
 }: BrowseTopBarProps) {
   const sortLabel = SORT_OPTIONS.find(o => o.value === sortBy)?.label ?? 'Sort by';
   const bedsLabel =
-    filters.bedroomsMin != null ? `${filters.bedroomsMin}+ Beds` : 'Beds & Bath';
+    filters.bedroomsMin != null ? `${filters.bedroomsMin}+ Bedrooms` : 'Bedrooms';
 
   function removeLocation(loc: string) {
     onFiltersChange({
@@ -146,15 +146,17 @@ export function BrowseTopBar({
           )}
         </Dropdown>
 
-        {/* More Filters — clears everything back to sidebar */}
-        <button
-          type="button"
-          onClick={() => onFiltersChange(EMPTY_FILTERS)}
-          className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:border-slate-300 hover:bg-slate-50"
-        >
-          More Filters
-          <ChevronDown className="h-4 w-4" />
-        </button>
+        {/* Clear all — only shown when filters are active */}
+        {isFiltered(filters) && (
+          <button
+            type="button"
+            onClick={() => onFiltersChange(EMPTY_FILTERS)}
+            className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:border-slate-300 hover:bg-slate-50"
+          >
+            Clear all filters
+            <X className="h-4 w-4" />
+          </button>
+        )}
 
         {/* Spacer */}
         <div className="flex-1" />

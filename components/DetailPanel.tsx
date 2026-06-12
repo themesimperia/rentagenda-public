@@ -37,6 +37,7 @@ export function DetailPanel({
 }) {
   const [tab, setTab] = useState<Tab>('overview');
   const [inquiryOpen, setInquiryOpen] = useState(false);
+  const [intent, setIntent] = useState<'message' | 'viewing'>('message');
   const avail = availability(listing);
   const ownerName = listing.owner_name?.trim();
 
@@ -217,7 +218,9 @@ export function DetailPanel({
         {inquiryOpen ? (
           <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
             <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-slate-700">Request a viewing</h3>
+              <h3 className="text-sm font-semibold text-slate-700">
+                {intent === 'viewing' ? 'Request a viewing' : 'Contact owner'}
+              </h3>
               <button
                 type="button"
                 onClick={() => setInquiryOpen(false)}
@@ -227,7 +230,7 @@ export function DetailPanel({
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <InquiryForm listing={listing} />
+            <InquiryForm listing={listing} intent={intent} />
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-3">
@@ -235,14 +238,14 @@ export function DetailPanel({
               variant="outline"
               size="lg"
               className="border-blue-200 text-blue-600 hover:bg-blue-50"
-              onClick={() => setInquiryOpen(true)}
+              onClick={() => { setIntent('message'); setInquiryOpen(true); }}
             >
               Contact Owner
             </Button>
             <Button
               size="lg"
               className="bg-blue-600 hover:bg-blue-700"
-              onClick={() => setInquiryOpen(true)}
+              onClick={() => { setIntent('viewing'); setInquiryOpen(true); }}
             >
               Request Viewing
             </Button>

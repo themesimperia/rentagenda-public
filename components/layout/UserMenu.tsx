@@ -4,8 +4,9 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ChevronDown, LogOut, LayoutDashboard, Building2, Bookmark } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
+import { OWNER_APP_URL } from '@/lib/config';
 
-const AGENDARENT_URL = 'https://rent-agenda.vercel.app';
+const AGENDARENT_URL = OWNER_APP_URL;
 
 function initials(nameOrEmail: string): string {
   const base = nameOrEmail.includes('@') ? nameOrEmail.split('@')[0] : nameOrEmail;
