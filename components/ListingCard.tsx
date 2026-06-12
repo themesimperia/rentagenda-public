@@ -1,7 +1,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { MapPin, Bookmark, Bed, Bath, Maximize2 } from 'lucide-react';
+import { MapPin, Bed, Bath, Maximize2 } from 'lucide-react';
 import { propertyTypeLabel, formatPrice, availability } from '@/lib/format';
+import { SaveButton } from '@/components/SaveButton';
 import type { PublicListing } from '@/lib/types';
 
 interface ListingCardProps {
@@ -40,9 +41,9 @@ export function ListingCard({ listing, onSelect, selected, href }: ListingCardPr
         {propertyTypeLabel(listing.property_type)}
       </span>
 
-      {/* Availability badge */}
+      {/* Availability badge — shifted down to clear the save button overlay */}
       <span
-        className={`absolute right-3 top-3 rounded-full bg-white/95 px-2.5 py-1 text-xs font-semibold shadow-sm backdrop-blur ${
+        className={`absolute right-3 top-[3.25rem] rounded-full bg-white/95 px-2.5 py-1 text-xs font-semibold shadow-sm backdrop-blur ${
           avail.tone === 'green' ? 'text-emerald-600' : 'text-amber-600'
         }`}
       >
@@ -51,19 +52,14 @@ export function ListingCard({ listing, onSelect, selected, href }: ListingCardPr
 
       {/* Floating info card */}
       <div className="absolute inset-x-3 bottom-3 rounded-xl bg-white/95 p-3 shadow-md backdrop-blur">
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0">
-            <h3 className="truncate text-sm font-semibold text-slate-900">{listing.title}</h3>
-            {listing.address_public && (
-              <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-slate-500">
-                <MapPin className="h-3 w-3 shrink-0 text-blue-600" />
-                <span className="truncate">{listing.address_public}</span>
-              </p>
-            )}
-          </div>
-          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-600">
-            <Bookmark className="h-3.5 w-3.5" />
-          </span>
+        <div className="min-w-0">
+          <h3 className="truncate text-sm font-semibold text-slate-900">{listing.title}</h3>
+          {listing.address_public && (
+            <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-slate-500">
+              <MapPin className="h-3 w-3 shrink-0 text-blue-600" />
+              <span className="truncate">{listing.address_public}</span>
+            </p>
+          )}
         </div>
 
         <div className="mt-2 flex items-center justify-between border-t border-slate-100 pt-2">
@@ -93,15 +89,11 @@ export function ListingCard({ listing, onSelect, selected, href }: ListingCardPr
     </div>
   );
 
-  if (href) {
-    return (
-      <Link href={href} className="block focus:outline-none">
-        {card}
-      </Link>
-    );
-  }
-
-  return (
+  const clickable = href ? (
+    <Link href={href} className="block focus:outline-none">
+      {card}
+    </Link>
+  ) : (
     <button
       type="button"
       onClick={() => onSelect?.(listing)}
@@ -110,5 +102,15 @@ export function ListingCard({ listing, onSelect, selected, href }: ListingCardPr
     >
       {card}
     </button>
+  );
+
+  return (
+    <div className="relative">
+      {clickable}
+      {/* Save control overlays the card as a sibling so it isn't a button-in-anchor */}
+      <div className="absolute right-3 top-3 z-10">
+        <SaveButton listing={listing} className="h-8 w-8 shadow-sm" />
+      </div>
+    </div>
   );
 }

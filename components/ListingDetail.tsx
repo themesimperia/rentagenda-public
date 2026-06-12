@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { PhotoGallery } from '@/components/PhotoGallery';
 import { InquiryForm } from '@/components/InquiryForm';
 import { PropertyMap } from '@/components/PropertyMap';
+import { SaveButton } from '@/components/SaveButton';
 import { propertyTypeLabel, termLabel, formatPrice, availability } from '@/lib/format';
 import type { PublicListing } from '@/lib/types';
 
@@ -174,11 +175,14 @@ export function ListingDetail({ listing }: { listing: PublicListing }) {
           <aside className="lg:sticky lg:top-20 lg:self-start">
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-md">
               {/* Price */}
-              <div className="mb-4 border-b border-slate-100 pb-4">
-                <p className="text-3xl font-bold text-slate-900">
-                  {formatPrice(listing.price, listing.currency)}
-                </p>
-                <p className="mt-0.5 text-sm text-slate-400">/month</p>
+              <div className="mb-4 flex items-start justify-between border-b border-slate-100 pb-4">
+                <div>
+                  <p className="text-3xl font-bold text-slate-900">
+                    {formatPrice(listing.price, listing.currency)}
+                  </p>
+                  <p className="mt-0.5 text-sm text-slate-400">/month</p>
+                </div>
+                <SaveButton listing={listing} className="h-10 w-10" />
               </div>
 
               {/* Availability */}
