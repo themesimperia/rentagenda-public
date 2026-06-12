@@ -1,48 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { SearchX } from 'lucide-react';
-import { useAuth } from '@/lib/auth-context';
-import { useSavedListings } from '@/lib/saved-listings-context';
-import { getSavedListings, getListing } from '@/lib/firestore';
+import { useSavedListingsData } from '@/lib/use-saved-listings-data';
 import { ListingCard } from '@/components/ListingCard';
 import { formatPrice } from '@/lib/format';
-import type { SavedListing } from '@/lib/saved-listings';
-import type { PublicListing } from '@/lib/types';
-
-type Row =
-  | { kind: 'live'; saved: SavedListing; listing: PublicListing }
-  | { kind: 'gone'; saved: SavedListing };
 
 export function SavedPanel() {
-  const { user } = useAuth();
-  const { savedIds } = useSavedListings();
-  const [rows, setRows] = useState<Row[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!user) return;
-    let active = true;
-    (async () => {
-      setLoading(true);
-      const saved = await getSavedListings(user.uid);
-      const resolved = await Promise.all(
-        saved.map(async (s): Promise<Row> => {
-          const listing = await getListing(s.listing_id).catch(() => null);
-          return listing ? { kind: 'live', saved: s, listing } : { kind: 'gone', saved: s };
-        }),
-      );
-      if (active) {
-        setRows(resolved);
-        setLoading(false);
-      }
-    })();
-    return () => { active = false; };
-  }, [user]);
-
-  // Reflect un-saves done elsewhere (heart toggles) without a refetch.
-  const visible = rows.filter(r => savedIds.has(r.saved.listing_id));
+  const { rows: visible, loading } = useSavedListingsData();
 
   if (loading) {
     return (

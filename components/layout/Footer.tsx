@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Building2 } from 'lucide-react';
 import { OWNER_APP_URL } from '@/lib/config';
 
@@ -19,6 +22,9 @@ const LINKS = {
 };
 
 export function Footer() {
+  const pathname = usePathname();
+  if (pathname.startsWith('/dashboard')) return null;
+
   return (
     <footer className="bg-slate-900 text-slate-400">
       {/* Main grid */}

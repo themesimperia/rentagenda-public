@@ -22,6 +22,8 @@ export function Header() {
   const { openAuth } = useAuthModal();
   const [search, setSearch] = useState('');
 
+  if (pathname.startsWith('/dashboard')) return null;
+
   function submitSearch(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const q = search.trim();
