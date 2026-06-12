@@ -83,7 +83,6 @@ export function MarketplaceDashboard({
             <FilterBar
               value={filters}
               onApply={setFilters}
-              locations={locations}
               types={types}
               amenities={amenities}
             />

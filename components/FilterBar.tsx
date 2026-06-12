@@ -36,13 +36,15 @@ function toggle<T>(arr: T[], v: T): T[] {
 interface FilterBarProps {
   value: MarketplaceFilters;
   onApply: (f: MarketplaceFilters) => void;
-  locations: string[];
   types: PropertyType[];
   amenities: string[];
 }
 
 export function FilterBar({ value, onApply, types, amenities }: FilterBarProps) {
   const [draft, setDraft] = useState<MarketplaceFilters>(value);
+  // Re-seed the draft whenever the committed filters change so the bar reflects
+  // live sidebar edits. Trade-off: editing the sidebar mid-edit discards any
+  // un-applied bar changes (the live sidebar is the source of truth).
   useEffect(() => { setDraft(value); }, [value]);
 
   const { user } = useAuth();
@@ -55,6 +57,8 @@ export function FilterBar({ value, onApply, types, amenities }: FilterBarProps) 
     if (!user) { openAuth('signin'); close(); return; }
     setSaving(true);
     try {
+      // Apply the draft too, so the saved search matches the visible results.
+      onApply(draft);
       await saveSearch(user.uid, name.trim() || summarizeFilters(draft), draft);
       setSaved(true);
       setName('');

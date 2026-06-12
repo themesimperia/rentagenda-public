@@ -22,7 +22,6 @@ describe('FilterBar', () => {
       <FilterBar
         value={EMPTY_FILTERS}
         onApply={onApply}
-        locations={[]}
         types={['apartment']}
         amenities={[]}
       />,
@@ -37,13 +36,12 @@ describe('FilterBar', () => {
   it('re-seeds the draft when the committed value changes', () => {
     const onApply = vi.fn();
     const { rerender } = render(
-      <FilterBar value={EMPTY_FILTERS} onApply={onApply} locations={[]} types={[]} amenities={[]} />,
+      <FilterBar value={EMPTY_FILTERS} onApply={onApply} types={[]} amenities={[]} />,
     );
     rerender(
       <FilterBar
         value={{ ...EMPTY_FILTERS, search: 'Bucharest' }}
         onApply={onApply}
-        locations={[]}
         types={[]}
         amenities={[]}
       />,
