@@ -17,7 +17,7 @@ export type SavedRow =
  *  gates on auth). */
 export function useSavedListingsData(): { rows: SavedRow[]; loading: boolean } {
   const { user } = useAuth();
-  const { savedIds } = useSavedListings();
+  const { savedIds, loading: savedIdsLoading } = useSavedListings();
   const [rows, setRows] = useState<SavedRow[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -42,5 +42,8 @@ export function useSavedListingsData(): { rows: SavedRow[]; loading: boolean } {
   }, [user]);
 
   const visible = rows.filter(r => savedIds.has(r.saved.listing_id));
-  return { rows: visible, loading };
+  // Stay in the loading state until BOTH the snapshot fetch and the savedIds
+  // context have resolved, otherwise `visible` is briefly empty (filtered by a
+  // not-yet-populated set) and the UI flashes its empty state.
+  return { rows: visible, loading: loading || savedIdsLoading };
 }

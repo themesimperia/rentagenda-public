@@ -30,6 +30,7 @@ export function DashboardTopbar() {
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
+            aria-label="Search listings"
             placeholder="Search listings…"
             className="w-full rounded-full border border-slate-200 bg-slate-50 py-2 pl-9 pr-4 text-sm text-slate-700 placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:outline-none"
           />

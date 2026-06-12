@@ -51,6 +51,8 @@ export function DashboardSidebar() {
             <Link
               key={item.href}
               href={item.href}
+              aria-label={item.label}
+              aria-current={active ? 'page' : undefined}
               className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
                 active
                   ? 'bg-blue-50 text-blue-600'
