@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth-context';
 import { useAuthModal } from '@/lib/auth-modal-context';
 import { UserMenu } from '@/components/layout/UserMenu';
+import { OWNER_APP_URL } from '@/lib/config';
 
 const NAV = [
   { href: '/', label: 'Home' },
@@ -82,7 +83,7 @@ export function Header() {
           {/* Auth area + icons */}
           <div className="flex shrink-0 items-center gap-1">
             <a
-              href="https://rent-agenda.vercel.app/Inquiries"
+              href={`${OWNER_APP_URL}/Inquiries`}
               target="_blank"
               rel="noopener noreferrer"
               title="Messages"
@@ -91,7 +92,7 @@ export function Header() {
               <MessageSquare className="h-5 w-5" />
             </a>
             <a
-              href="https://rent-agenda.vercel.app"
+              href={OWNER_APP_URL}
               target="_blank"
               rel="noopener noreferrer"
               title="Notifications"
