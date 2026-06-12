@@ -20,6 +20,7 @@ interface AuthContextValue {
   signUpEmail: (name: string, email: string, password: string) => Promise<void>;
   signInGoogle: () => Promise<void>;
   signOutUser: () => Promise<void>;
+  updateDisplayName: (name: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -55,9 +56,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await signOut(auth);
   };
 
+  const updateDisplayName = async (name: string) => {
+    if (!auth.currentUser) return;
+    await updateProfile(auth.currentUser, { displayName: name });
+    setUser({ ...auth.currentUser });
+  };
+
   return (
     <AuthContext.Provider
-      value={{ user, loading, signInEmail, signUpEmail, signInGoogle, signOutUser }}
+      value={{ user, loading, signInEmail, signUpEmail, signInGoogle, signOutUser, updateDisplayName }}
     >
       {children}
     </AuthContext.Provider>

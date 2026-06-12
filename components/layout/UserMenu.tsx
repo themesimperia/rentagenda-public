@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ChevronDown, LogOut, LayoutDashboard, Building2 } from 'lucide-react';
+import Link from 'next/link';
+import { ChevronDown, LogOut, LayoutDashboard, Building2, Bookmark } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 
 const AGENDARENT_URL = 'https://rent-agenda.vercel.app';
@@ -57,6 +58,15 @@ export function UserMenu() {
             <p className="truncate text-sm font-semibold text-slate-800">{name}</p>
             {email && <p className="truncate text-xs text-slate-400">{email}</p>}
           </div>
+
+          <Link
+            href="/dashboard"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50"
+          >
+            <Bookmark className="h-4 w-4 text-slate-400" />
+            My dashboard
+          </Link>
 
           <a
             href={AGENDARENT_URL}
