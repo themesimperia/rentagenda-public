@@ -1,9 +1,9 @@
 'use client';
 
-import { MapPin, DollarSign, Maximize2, Building2, Sparkles, X } from 'lucide-react';
-import { propertyTypeLabel } from '@/lib/format';
+import { MapPin, DollarSign, Maximize2, Building2, Sparkles, CalendarClock, X } from 'lucide-react';
+import { propertyTypeLabel, termLabel } from '@/lib/format';
 import { type MarketplaceFilters, EMPTY_FILTERS, isFiltered } from '@/lib/filter';
-import type { PropertyType } from '@/lib/types';
+import type { PropertyType, RentalTerm } from '@/lib/types';
 
 // ── Price slider constants ──────────────────────────────────────────────────
 const PRICE_MAX = 10_000;
@@ -14,6 +14,8 @@ const PRICE_PRESETS = [
   { label: '$1,000 – $15,000', min: 1_000 as number | null, max: 15_000 as number | null },
   { label: 'More Than $15,000', min: 15_000 as number | null, max: null as number | null },
 ];
+
+const RENTAL_TERMS: RentalTerm[] = ['long_term', 'short_term'];
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 function toggle<T>(arr: T[], value: T): T[] {
@@ -302,6 +304,28 @@ export function FilterSidebar({ filters, onChange, locations, types, amenities }
           </div>
         </Section>
       )}
+
+      {/* Rental term */}
+      <Section
+        icon={CalendarClock}
+        title="Rental term"
+        active={filters.terms.length > 0}
+        onClear={() => set('terms', [])}
+      >
+        <div className="space-y-2.5">
+          {RENTAL_TERMS.map(term => (
+            <label key={term} className="flex cursor-pointer items-center gap-2.5 text-sm text-slate-600">
+              <input
+                type="checkbox"
+                checked={filters.terms.includes(term)}
+                onChange={() => set('terms', toggle(filters.terms, term))}
+                className="h-4 w-4 rounded border-slate-300 text-blue-600 accent-blue-600 focus:ring-blue-500"
+              />
+              {termLabel(term)}
+            </label>
+          ))}
+        </div>
+      </Section>
 
       {/* Amenities */}
       {amenities.length > 0 && (
