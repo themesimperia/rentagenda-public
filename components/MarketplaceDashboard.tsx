@@ -54,7 +54,7 @@ export function MarketplaceDashboard({
   );
 
   const selected =
-    filtered.find(l => l.id === selectedId) ?? filtered[0] ?? null;
+    filtered.find(l => l.id === selectedId) ?? null;
 
   return (
     <div className="min-h-screen bg-slate-50">
