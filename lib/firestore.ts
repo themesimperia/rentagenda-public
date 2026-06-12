@@ -13,7 +13,7 @@ import {
   type DocumentData,
 } from 'firebase/firestore';
 import { db } from './firebase';
-import type { PublicListing, InquiryFormData } from './types';
+import type { PublicListing, InquiryFormData, InquiryIntent } from './types';
 import { buildSavedSnapshot, type SavedListing } from './saved-listings';
 import { cache } from 'react';
 
@@ -58,7 +58,8 @@ export const getListing = cache(async (id: string): Promise<PublicListing | null
 
 export async function createInquiry(
   listing: PublicListing,
-  form: InquiryFormData
+  form: InquiryFormData,
+  intent: InquiryIntent = 'message'
 ): Promise<void> {
   await addDoc(collection(db, 'listing_inquiries'), {
     listing_id: listing.id,
@@ -68,6 +69,7 @@ export async function createInquiry(
     guest_email: form.guest_email,
     guest_phone: form.guest_phone || null,
     message: form.message || null,
+    inquiry_type: intent,
     created_at: serverTimestamp(),
     status: 'new',
     source: 'public_site',

@@ -39,3 +39,5 @@ export interface InquiryFormData {
   guest_phone?: string;
   message?: string;
 }
+
+export type InquiryIntent = 'message' | 'viewing';

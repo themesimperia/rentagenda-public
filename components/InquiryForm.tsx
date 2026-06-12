@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { createInquiry } from '@/lib/firestore';
-import type { PublicListing, InquiryFormData } from '@/lib/types';
+import type { PublicListing, InquiryFormData, InquiryIntent } from '@/lib/types';
 import { CheckCircle2 } from 'lucide-react';
 
 const EMPTY: InquiryFormData = {
@@ -16,7 +16,13 @@ const EMPTY: InquiryFormData = {
   message: '',
 };
 
-export function InquiryForm({ listing }: { listing: PublicListing }) {
+export function InquiryForm({
+  listing,
+  intent = 'message',
+}: {
+  listing: PublicListing;
+  intent?: InquiryIntent;
+}) {
   const [form, setForm] = useState<InquiryFormData>(EMPTY);
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [error, setError] = useState('');
@@ -34,7 +40,7 @@ export function InquiryForm({ listing }: { listing: PublicListing }) {
     setError('');
     setStatus('submitting');
     try {
-      await createInquiry(listing, form);
+      await createInquiry(listing, form, intent);
       setStatus('success');
       setForm(EMPTY);
     } catch {
