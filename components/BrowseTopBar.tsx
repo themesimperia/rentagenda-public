@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { X, ChevronDown, LayoutGrid, List } from 'lucide-react';
+import { useState } from 'react';
+import { X, LayoutGrid, List } from 'lucide-react';
+import { FilterPopover } from '@/components/ui/FilterPopover';
 import { type MarketplaceFilters, EMPTY_FILTERS, isFiltered } from '@/lib/filter';
 
 export type SortBy = 'relevant' | 'newest' | 'price_asc' | 'price_desc';
@@ -22,49 +23,6 @@ const SORT_OPTIONS: { label: string; value: SortBy }[] = [
   { label: 'Price: High – Low', value: 'price_desc' },
 ];
 
-function Dropdown({
-  label,
-  active,
-  children,
-}: {
-  label: string;
-  active?: boolean;
-  children: (close: () => void) => React.ReactNode;
-}) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function onDown(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    }
-    document.addEventListener('mousedown', onDown);
-    return () => document.removeEventListener('mousedown', onDown);
-  }, []);
-
-  return (
-    <div className="relative" ref={ref}>
-      <button
-        type="button"
-        onClick={() => setOpen(o => !o)}
-        className={`flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
-          active
-            ? 'border-blue-600 bg-blue-50 text-blue-700'
-            : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
-        }`}
-      >
-        {label}
-        <ChevronDown className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`} />
-      </button>
-
-      {open && (
-        <div className="absolute left-0 top-full z-30 mt-1.5 min-w-[180px] overflow-hidden rounded-xl border border-slate-100 bg-white py-1.5 shadow-lg">
-          {children(() => setOpen(false))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 interface BrowseTopBarProps {
   filters: MarketplaceFilters;
@@ -75,6 +33,8 @@ interface BrowseTopBarProps {
   onSortChange: (s: SortBy) => void;
   view: ViewMode;
   onViewChange: (v: ViewMode) => void;
+  cols: 2 | 3;
+  onColsChange: (c: 2 | 3) => void;
 }
 
 export function BrowseTopBar({
@@ -86,6 +46,8 @@ export function BrowseTopBar({
   onSortChange,
   view,
   onViewChange,
+  cols,
+  onColsChange,
 }: BrowseTopBarProps) {
   const sortLabel = SORT_OPTIONS.find(o => o.value === sortBy)?.label ?? 'Sort by';
   const bedsLabel =
@@ -121,7 +83,7 @@ export function BrowseTopBar({
         ))}
 
         {/* Beds & Bath */}
-        <Dropdown label={bedsLabel} active={filters.bedroomsMin != null}>
+        <FilterPopover label={bedsLabel} active={filters.bedroomsMin != null}>
           {close => (
             <>
               {BEDS_OPTIONS.map(opt => (
@@ -144,7 +106,7 @@ export function BrowseTopBar({
               ))}
             </>
           )}
-        </Dropdown>
+        </FilterPopover>
 
         {/* Clear all — only shown when filters are active */}
         {isFiltered(filters) && (
@@ -160,6 +122,25 @@ export function BrowseTopBar({
 
         {/* Spacer */}
         <div className="flex-1" />
+
+        {/* Column count (grid view only) */}
+        {view === 'grid' && (
+          <div className="hidden items-center gap-1 rounded-full border border-slate-200 bg-white p-1 sm:flex">
+            {([2, 3] as const).map(c => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => onColsChange(c)}
+                aria-label={`${c} columns`}
+                className={`grid h-7 w-7 place-items-center rounded-full text-xs font-semibold transition-colors ${
+                  cols === c ? 'bg-blue-600 text-white' : 'text-slate-500 hover:bg-slate-100'
+                }`}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* View toggle */}
         <div className="flex items-center gap-1 rounded-full border border-slate-200 bg-white p-1">
@@ -196,7 +177,7 @@ export function BrowseTopBar({
         )}
         <span className="text-slate-300">·</span>
         <span>Sort by</span>
-        <Dropdown label={sortLabel}>
+        <FilterPopover label={sortLabel}>
           {close =>
             SORT_OPTIONS.map(opt => (
               <button
@@ -212,7 +193,7 @@ export function BrowseTopBar({
               </button>
             ))
           }
-        </Dropdown>
+        </FilterPopover>
       </div>
     </div>
   );

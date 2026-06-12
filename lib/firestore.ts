@@ -15,6 +15,8 @@ import {
 import { db } from './firebase';
 import type { PublicListing, InquiryFormData, InquiryIntent } from './types';
 import { buildSavedSnapshot, type SavedListing } from './saved-listings';
+import type { MarketplaceFilters } from '@/lib/filter';
+import type { SavedSearch } from '@/lib/saved-searches';
 import { cache } from 'react';
 
 /** Firestore Timestamp (or anything) -> epoch millis, so listings are plain
@@ -100,6 +102,39 @@ export async function getSavedListings(uid: string): Promise<SavedListing[]> {
       saved_at: toMillis(data.saved_at),
     };
   });
+}
+
+export async function saveSearch(
+  uid: string,
+  name: string,
+  filters: MarketplaceFilters,
+): Promise<void> {
+  await addDoc(collection(db, 'users', uid, 'saved_searches'), {
+    name,
+    filters,
+    created_at: serverTimestamp(),
+  });
+}
+
+export async function getSavedSearches(uid: string): Promise<SavedSearch[]> {
+  const q = query(
+    collection(db, 'users', uid, 'saved_searches'),
+    orderBy('created_at', 'desc'),
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map(d => {
+    const data = d.data();
+    return {
+      id: d.id,
+      name: data.name ?? '',
+      filters: data.filters as MarketplaceFilters,
+      created_at: data.created_at?.toMillis?.() ?? null,
+    };
+  });
+}
+
+export async function deleteSavedSearch(uid: string, id: string): Promise<void> {
+  await deleteDoc(doc(db, 'users', uid, 'saved_searches', id));
 }
 
 export async function saveListing(uid: string, listing: PublicListing): Promise<void> {
