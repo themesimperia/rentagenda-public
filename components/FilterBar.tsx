@@ -1,9 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Search } from 'lucide-react';
+import { Search, Bookmark } from 'lucide-react';
 import { FilterPopover } from '@/components/ui/FilterPopover';
 import { propertyTypeLabel, termLabel } from '@/lib/format';
+import { summarizeFilters } from '@/lib/saved-searches';
+import { saveSearch } from '@/lib/firestore';
+import { useAuth } from '@/lib/auth-context';
+import { useAuthModal } from '@/lib/auth-modal-context';
 import type { MarketplaceFilters } from '@/lib/filter';
 import type { PropertyType, RentalTerm } from '@/lib/types';
 
@@ -40,6 +44,25 @@ interface FilterBarProps {
 export function FilterBar({ value, onApply, types, amenities }: FilterBarProps) {
   const [draft, setDraft] = useState<MarketplaceFilters>(value);
   useEffect(() => { setDraft(value); }, [value]);
+
+  const { user } = useAuth();
+  const { openAuth } = useAuthModal();
+  const [name, setName] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  async function handleSave(close: () => void) {
+    if (!user) { openAuth('signin'); close(); return; }
+    setSaving(true);
+    try {
+      await saveSearch(user.uid, name.trim() || summarizeFilters(draft), draft);
+      setSaved(true);
+      setName('');
+      setTimeout(() => { setSaved(false); close(); }, 900);
+    } finally {
+      setSaving(false);
+    }
+  }
 
   function set<K extends keyof MarketplaceFilters>(key: K, v: MarketplaceFilters[K]) {
     setDraft(d => ({ ...d, [key]: v }));
@@ -230,6 +253,44 @@ export function FilterBar({ value, onApply, types, amenities }: FilterBarProps) 
       >
         Apply
       </button>
+
+      {/* Save Search */}
+      <FilterPopover label="Save Search">
+        {close => (
+          <div className="w-64 px-3 py-2">
+            {!user ? (
+              <button
+                type="button"
+                onClick={() => { openAuth('signin'); close(); }}
+                className="w-full rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+              >
+                Sign in to save searches
+              </button>
+            ) : saved ? (
+              <p className="px-1 py-2 text-sm font-medium text-emerald-600">Saved ✓</p>
+            ) : (
+              <>
+                <p className="mb-2 text-xs text-slate-500">{summarizeFilters(draft)}</p>
+                <input
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  placeholder="Name this search"
+                  aria-label="Saved search name"
+                  className="mb-2 w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm focus:border-blue-500 focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleSave(close)}
+                  disabled={saving}
+                  className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
+                >
+                  <Bookmark className="h-3.5 w-3.5" /> Save search
+                </button>
+              </>
+            )}
+          </div>
+        )}
+      </FilterPopover>
     </div>
   );
 }

@@ -3,6 +3,18 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { FilterBar } from '@/components/FilterBar';
 import { EMPTY_FILTERS } from '@/lib/filter';
 
+vi.mock('@/lib/firestore', () => ({
+  saveSearch: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('@/lib/auth-context', () => ({
+  useAuth: () => ({ user: null, loading: false }),
+}));
+
+vi.mock('@/lib/auth-modal-context', () => ({
+  useAuthModal: () => ({ openAuth: vi.fn(), closeAuth: vi.fn() }),
+}));
+
 describe('FilterBar', () => {
   it('emits the edited draft on Apply', () => {
     const onApply = vi.fn();
