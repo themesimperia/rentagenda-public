@@ -23,11 +23,11 @@ interface NavItem {
 const NAV: NavItem[] = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard, exact: true },
   { href: '/dashboard/saved', label: 'Saved', icon: Bookmark },
+  { href: '/dashboard/searches', label: 'Searches', icon: SlidersHorizontal },
   { href: '/dashboard/profile', label: 'Profile', icon: User },
 ];
 
 const SOON: { label: string; icon: LucideIcon }[] = [
-  { label: 'Searches', icon: SlidersHorizontal },
   { label: 'Inquiries', icon: MessageSquare },
   { label: 'Viewings', icon: CalendarClock },
 ];
