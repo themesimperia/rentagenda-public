@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Bell, Building2, MessageSquare, Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth-context';
-import { AuthModal } from '@/components/auth/AuthModal';
+import { useAuthModal } from '@/lib/auth-modal-context';
 import { UserMenu } from '@/components/layout/UserMenu';
 
 const NAV = [
@@ -18,14 +18,8 @@ export function Header() {
   const { user, loading } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
-  const [authOpen, setAuthOpen] = useState(false);
-  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
+  const { openAuth } = useAuthModal();
   const [search, setSearch] = useState('');
-
-  function openAuth(mode: 'signin' | 'signup') {
-    setAuthMode(mode);
-    setAuthOpen(true);
-  }
 
   function submitSearch(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -34,8 +28,7 @@ export function Header() {
   }
 
   return (
-    <>
-      <header className="sticky top-0 z-50 border-b border-slate-100 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+    <header className="sticky top-0 z-50 border-b border-slate-100 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
         <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-6">
           {/* Logo */}
           <Link href="/" className="flex shrink-0 items-center gap-2 font-bold text-slate-900">
@@ -132,8 +125,5 @@ export function Header() {
           </div>
         </div>
       </header>
-
-      <AuthModal open={authOpen} initialMode={authMode} onClose={() => setAuthOpen(false)} />
-    </>
   );
 }
