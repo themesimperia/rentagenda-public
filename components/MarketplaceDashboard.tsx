@@ -43,6 +43,7 @@ export function MarketplaceDashboard({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<SortBy>('relevant');
   const [view, setView] = useState<ViewMode>('grid');
+  const [cols, setCols] = useState<2 | 3>(2);
 
   const locations = useMemo(() => deriveLocations(listings), [listings]);
   const types = useMemo(() => deriveTypes(listings), [listings]);
@@ -87,6 +88,8 @@ export function MarketplaceDashboard({
               onSortChange={setSortBy}
               view={view}
               onViewChange={setView}
+              cols={cols}
+              onColsChange={setCols}
             />
 
             {/* Grid / list */}
@@ -103,7 +106,11 @@ export function MarketplaceDashboard({
                 </button>
               </div>
             ) : view === 'grid' ? (
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+              <div
+                className={`grid grid-cols-1 gap-5 ${
+                  cols === 3 ? 'sm:grid-cols-2 xl:grid-cols-3' : 'sm:grid-cols-2'
+                }`}
+              >
                 {filtered.map(listing => (
                   <ListingCard
                     key={listing.id}

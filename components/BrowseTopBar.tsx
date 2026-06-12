@@ -33,6 +33,8 @@ interface BrowseTopBarProps {
   onSortChange: (s: SortBy) => void;
   view: ViewMode;
   onViewChange: (v: ViewMode) => void;
+  cols: 2 | 3;
+  onColsChange: (c: 2 | 3) => void;
 }
 
 export function BrowseTopBar({
@@ -44,6 +46,8 @@ export function BrowseTopBar({
   onSortChange,
   view,
   onViewChange,
+  cols,
+  onColsChange,
 }: BrowseTopBarProps) {
   const sortLabel = SORT_OPTIONS.find(o => o.value === sortBy)?.label ?? 'Sort by';
   const bedsLabel =
@@ -118,6 +122,25 @@ export function BrowseTopBar({
 
         {/* Spacer */}
         <div className="flex-1" />
+
+        {/* Column count (grid view only) */}
+        {view === 'grid' && (
+          <div className="hidden items-center gap-1 rounded-full border border-slate-200 bg-white p-1 sm:flex">
+            {([2, 3] as const).map(c => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => onColsChange(c)}
+                aria-label={`${c} columns`}
+                className={`grid h-7 w-7 place-items-center rounded-full text-xs font-semibold transition-colors ${
+                  cols === c ? 'bg-blue-600 text-white' : 'text-slate-500 hover:bg-slate-100'
+                }`}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* View toggle */}
         <div className="flex items-center gap-1 rounded-full border border-slate-200 bg-white p-1">
