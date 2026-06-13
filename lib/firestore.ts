@@ -17,6 +17,7 @@ import type { PublicListing, InquiryFormData, InquiryIntent } from './types';
 import { buildSavedSnapshot, type SavedListing } from './saved-listings';
 import type { MarketplaceFilters } from '@/lib/filter';
 import type { SavedSearch } from '@/lib/saved-searches';
+import { EMPTY_RENTER_PROFILE, normalizeRenterProfile, type RenterProfile } from '@/lib/renter-profile';
 import { cache } from 'react';
 
 /** Firestore Timestamp (or anything) -> epoch millis, so listings are plain
@@ -146,4 +147,13 @@ export async function saveListing(uid: string, listing: PublicListing): Promise<
 
 export async function unsaveListing(uid: string, listingId: string): Promise<void> {
   await deleteDoc(doc(db, 'users', uid, 'saved_listings', listingId));
+}
+
+export async function getRenterProfile(uid: string): Promise<RenterProfile> {
+  const snap = await getDoc(doc(db, 'users', uid, 'renter_profile', 'main'));
+  return snap.exists() ? normalizeRenterProfile(snap.data()) : EMPTY_RENTER_PROFILE;
+}
+
+export async function saveRenterProfile(uid: string, data: RenterProfile): Promise<void> {
+  await setDoc(doc(db, 'users', uid, 'renter_profile', 'main'), data, { merge: true });
 }
