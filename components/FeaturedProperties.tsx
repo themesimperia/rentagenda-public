@@ -219,6 +219,15 @@ export function FeaturedProperties({ listings }: { listings: PublicListing[] }) 
             <FeaturedCard key={listing.id} listing={listing} />
           ))}
         </div>
+
+        <div className="mt-10 text-center">
+          <Link
+            href="/listings"
+            className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+          >
+            Browse all {listings.length} {listings.length === 1 ? 'property' : 'properties'} →
+          </Link>
+        </div>
       </div>
     </section>
   );
