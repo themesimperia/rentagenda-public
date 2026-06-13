@@ -36,12 +36,14 @@ export function ProfileCard() {
   if (!user) return null;
 
   function startEdit() {
+    if (!user) return;
     setName(user.displayName ?? '');
     setDraft(profile);
     setEditing(true);
   }
 
   async function save() {
+    if (!user) return;
     setSaving(true);
     try {
       await updateDisplayName(name.trim());
