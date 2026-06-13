@@ -32,7 +32,9 @@ export function ActivityStats() {
   }
 
   const kpis = computeKpis(rows);
-  const total = kpis.savedCount + searchesCount + kpis.availableNow;
+  // Each ring fills relative to the largest metric (honest relative magnitude).
+  // Summing would double-count: availableNow is a subset of savedCount.
+  const total = Math.max(kpis.savedCount, searchesCount, kpis.availableNow, 1);
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">

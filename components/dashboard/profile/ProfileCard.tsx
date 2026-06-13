@@ -19,6 +19,7 @@ export function ProfileCard() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [draft, setDraft] = useState<RenterProfile>(EMPTY_RENTER_PROFILE);
 
@@ -45,11 +46,14 @@ export function ProfileCard() {
   async function save() {
     if (!user) return;
     setSaving(true);
+    setError(null);
     try {
       await updateDisplayName(name.trim());
       await saveRenterProfile(user.uid, draft);
       setProfile(draft);
       setEditing(false);
+    } catch {
+      setError("Couldn't save your profile. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -98,6 +102,7 @@ export function ProfileCard() {
               Cancel
             </Button>
           </div>
+          {error && <p className="text-sm text-red-600">{error}</p>}
         </div>
       ) : (
         <div className="mt-6 space-y-2.5 text-sm">
