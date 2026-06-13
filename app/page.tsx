@@ -1,6 +1,10 @@
 import { ShieldCheck, BadgeDollarSign, MessageSquare, Building2 } from 'lucide-react';
 import { HeroSearch } from '@/components/HeroSearch';
 import { FeaturedProperties } from '@/components/FeaturedProperties';
+import { HowItWorks } from '@/components/home/HowItWorks';
+import { BrowseByCity } from '@/components/home/BrowseByCity';
+import { BrowseByType } from '@/components/home/BrowseByType';
+import { ValueProps } from '@/components/home/ValueProps';
 import { getPublishedListings } from '@/lib/firestore';
 import { deriveLocations } from '@/lib/filter';
 
@@ -59,8 +63,20 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* How it works */}
+      <HowItWorks />
+
       {/* Featured */}
       <FeaturedProperties listings={listings} />
+
+      {/* Browse by location */}
+      <BrowseByCity listings={listings} />
+
+      {/* Browse by property type */}
+      <BrowseByType listings={listings} />
+
+      {/* Why RentAgenda */}
+      <ValueProps />
     </>
   );
 }
