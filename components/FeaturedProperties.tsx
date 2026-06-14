@@ -158,7 +158,7 @@ export function FeaturedProperties({ listings }: { listings: PublicListing[] }) 
   if (listings.length === 0) return null;
 
   return (
-    <section className="bg-white py-16">
+    <section className="bg-slate-50 py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <h2 className="text-center text-3xl font-bold text-slate-900">Featured Listings</h2>
         <p className="mt-2 text-center text-slate-500">

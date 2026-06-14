@@ -38,20 +38,20 @@ export default async function HomePage() {
         />
         <div className="absolute inset-0 -z-10 bg-slate-900/60" />
 
-        <div className="mx-auto max-w-5xl px-4 py-24 text-center sm:px-6 sm:py-28">
-          <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
+        <div className="mx-auto max-w-4xl px-4 py-12 text-center sm:px-6 sm:py-16">
+          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
             Find Your Next Home
           </h1>
-          <p className="mx-auto mt-4 max-w-xl text-lg text-slate-200">
+          <p className="mx-auto mt-3 max-w-xl text-base text-slate-200">
             Where every real estate goal becomes reality — listings direct from verified owners.
           </p>
 
-          <div className="mt-10">
+          <div className="mt-7">
             <HeroSearch regions={regions} />
           </div>
 
           {/* Stats */}
-          <div className="mt-16 grid grid-cols-2 gap-8 sm:grid-cols-4">
+          <div className="mt-10 grid grid-cols-2 gap-6 sm:grid-cols-4">
             {stats.map(s => (
               <div key={s.label} className="text-center">
                 <p className="text-3xl font-bold text-white">{s.value}</p>
@@ -67,11 +67,11 @@ export default async function HomePage() {
       {/* 1. How does RentAgenda work? */}
       <HowItWorks />
 
-      {/* 2. Browse by property type */}
-      <BrowseByType listings={listings} />
-
-      {/* 3. Featured Listings */}
+      {/* 2. Featured Listings */}
       <FeaturedProperties listings={listings} />
+
+      {/* 3. Browse by property type */}
+      <BrowseByType listings={listings} />
 
       {/* 4. Browse by location */}
       <BrowseByCity listings={listings} />
