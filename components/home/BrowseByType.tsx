@@ -19,7 +19,7 @@ export function BrowseByType({ listings }: { listings: PublicListing[] }) {
   }
 
   return (
-    <section className="bg-white py-16">
+    <section className="bg-slate-50 py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <h2 className="text-center text-3xl font-bold text-slate-900">Browse by property type</h2>
         <p className="mt-2 text-center text-slate-500">Jump straight to the kind of home you want.</p>

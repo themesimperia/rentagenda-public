@@ -20,9 +20,9 @@ const STEPS = [
 
 export function HowItWorks() {
   return (
-    <section className="bg-slate-50 py-16">
+    <section className="bg-white py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <h2 className="text-center text-3xl font-bold text-slate-900">How it works</h2>
+        <h2 className="text-center text-3xl font-bold text-slate-900">How does RentAgenda work?</h2>
         <p className="mt-2 text-center text-slate-500">
           Renting directly from owners, in three simple steps.
         </p>

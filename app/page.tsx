@@ -4,6 +4,7 @@ import { FeaturedProperties } from '@/components/FeaturedProperties';
 import { HowItWorks } from '@/components/home/HowItWorks';
 import { BrowseByCity } from '@/components/home/BrowseByCity';
 import { BrowseByType } from '@/components/home/BrowseByType';
+import { TrendingApartments } from '@/components/home/TrendingApartments';
 import { ValueProps } from '@/components/home/ValueProps';
 import { getPublishedListings } from '@/lib/firestore';
 import { deriveLocations } from '@/lib/filter';
@@ -63,19 +64,22 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* How it works */}
+      {/* 1. How does RentAgenda work? */}
       <HowItWorks />
 
-      {/* Featured */}
-      <FeaturedProperties listings={listings} />
-
-      {/* Browse by location */}
-      <BrowseByCity listings={listings} />
-
-      {/* Browse by property type */}
+      {/* 2. Browse by property type */}
       <BrowseByType listings={listings} />
 
-      {/* Why RentAgenda */}
+      {/* 3. Featured Listings */}
+      <FeaturedProperties listings={listings} />
+
+      {/* 4. Browse by location */}
+      <BrowseByCity listings={listings} />
+
+      {/* 5. Trending apartments */}
+      <TrendingApartments listings={listings} />
+
+      {/* 6. Why RentAgenda */}
       <ValueProps />
     </>
   );
