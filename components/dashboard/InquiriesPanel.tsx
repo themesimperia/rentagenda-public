@@ -104,6 +104,7 @@ export function InquiriesPanel({ filter }: { filter: 'all' | 'viewing' }) {
               <InquiryThread
                 inquiryId={inq.id}
                 openingMessage={inq.message}
+                openingAt={inq.created_at}
                 currentUserId={user.uid}
               />
             )}
