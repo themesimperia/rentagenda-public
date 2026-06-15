@@ -14,6 +14,7 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 import type { PublicListing, InquiryFormData, InquiryIntent } from './types';
+import type { Inquiry, InquiryStatus } from '@/lib/inquiries';
 import { buildSavedSnapshot, type SavedListing } from './saved-listings';
 import type { MarketplaceFilters } from '@/lib/filter';
 import type { SavedSearch } from '@/lib/saved-searches';
@@ -62,12 +63,15 @@ export const getListing = cache(async (id: string): Promise<PublicListing | null
 export async function createInquiry(
   listing: PublicListing,
   form: InquiryFormData,
-  intent: InquiryIntent = 'message'
+  intent: InquiryIntent = 'message',
+  renterId: string | null = null,
 ): Promise<void> {
   await addDoc(collection(db, 'listing_inquiries'), {
     listing_id: listing.id,
     apartment_id: listing.apartment_id,
     owner_id: listing.owner_id,
+    listing_title: listing.title,
+    renter_id: renterId,
     guest_name: form.guest_name,
     guest_email: form.guest_email,
     guest_phone: form.guest_phone || null,
@@ -76,6 +80,29 @@ export async function createInquiry(
     created_at: serverTimestamp(),
     status: 'new',
     source: 'public_site',
+  });
+}
+
+export async function getMyInquiries(uid: string): Promise<Inquiry[]> {
+  const q = query(
+    collection(db, 'listing_inquiries'),
+    where('renter_id', '==', uid),
+    orderBy('created_at', 'desc'),
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map(d => {
+    const data = d.data();
+    return {
+      id: d.id,
+      listing_id: data.listing_id ?? '',
+      listing_title: data.listing_title ?? 'Listing',
+      owner_id: data.owner_id ?? '',
+      renter_id: data.renter_id ?? null,
+      inquiry_type: (data.inquiry_type === 'viewing' ? 'viewing' : 'message'),
+      message: data.message ?? null,
+      status: (data.status ?? 'new') as InquiryStatus,
+      created_at: data.created_at?.toMillis?.() ?? null,
+    };
   });
 }
 

@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { createInquiry } from '@/lib/firestore';
+import { useAuth } from '@/lib/auth-context';
 import type { PublicListing, InquiryFormData, InquiryIntent } from '@/lib/types';
 import { CheckCircle2 } from 'lucide-react';
 
@@ -24,6 +25,18 @@ export function InquiryForm({
   intent?: InquiryIntent;
 }) {
   const [form, setForm] = useState<InquiryFormData>(EMPTY);
+  const { user } = useAuth();
+
+  // Prefill name/email from the signed-in account without clobbering typed input.
+  useEffect(() => {
+    if (!user) return;
+    setForm(prev => ({
+      ...prev,
+      guest_name: prev.guest_name || user.displayName || '',
+      guest_email: prev.guest_email || user.email || '',
+    }));
+  }, [user]);
+
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [error, setError] = useState('');
 
@@ -40,7 +53,7 @@ export function InquiryForm({
     setError('');
     setStatus('submitting');
     try {
-      await createInquiry(listing, form, intent);
+      await createInquiry(listing, form, intent, user?.uid ?? null);
       setStatus('success');
       setForm(EMPTY);
     } catch {
