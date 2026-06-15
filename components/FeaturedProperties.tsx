@@ -6,8 +6,9 @@ import Link from 'next/link';
 import {
   MapPin, Bed, Bath, Maximize2, ChevronLeft, ChevronRight, Eye,
 } from 'lucide-react';
-import { propertyTypeLabel, formatPrice, availability } from '@/lib/format';
+import { propertyTypeLabel, formatPrice } from '@/lib/format';
 import { deriveTypes } from '@/lib/filter';
+import { AvailabilityBadge } from '@/components/AvailabilityBadge';
 import type { PublicListing, PropertyType } from '@/lib/types';
 
 const TAB_LABELS: Record<PropertyType, string> = {
@@ -65,25 +66,13 @@ function TermBadge({ listing }: { listing: PublicListing }) {
   );
 }
 
-function AvailabilityBadge({ listing }: { listing: PublicListing }) {
-  const a = availability(listing);
-  return (
-    <span
-      className={`absolute right-3 top-3 rounded-full px-2.5 py-1 text-xs font-semibold shadow-sm ${
-        a.tone === 'green' ? 'bg-white/95 text-emerald-600' : 'bg-white/95 text-amber-600'
-      }`}
-    >
-      {a.label}
-    </span>
-  );
-}
-
 function FeaturedCard({ listing }: { listing: PublicListing }) {
   const photo = listing.photos[0];
   return (
+    <div className="relative w-[280px] shrink-0 snap-start sm:w-auto sm:shrink">
     <Link
       href={`/listing/${listing.id}`}
-      className="group block w-[280px] shrink-0 snap-start overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm transition-shadow hover:shadow-md sm:w-auto sm:shrink"
+      className="group block overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm transition-shadow hover:shadow-md"
     >
       <div className="relative aspect-[4/3] w-full bg-slate-200">
         {photo ? (
@@ -98,7 +87,6 @@ function FeaturedCard({ listing }: { listing: PublicListing }) {
           <div className="flex h-full items-center justify-center text-slate-400">No photo</div>
         )}
         <TermBadge listing={listing} />
-        <AvailabilityBadge listing={listing} />
       </div>
 
       <div className="p-4">
@@ -137,6 +125,11 @@ function FeaturedCard({ listing }: { listing: PublicListing }) {
 
       <OwnerFooter listing={listing} />
     </Link>
+      {/* Availability badge overlay — sibling outside Link so popover escapes overflow-hidden */}
+      <div className="absolute right-3 top-3 z-10">
+        <AvailabilityBadge listing={listing} />
+      </div>
+    </div>
   );
 }
 
