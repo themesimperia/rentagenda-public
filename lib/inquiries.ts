@@ -24,3 +24,13 @@ export function renterStatusLabel(status: string): 'Sent' | 'Seen' | 'Replied' {
 export function inquiryTypeLabel(type: string): 'Message' | 'Viewing request' {
   return type === 'viewing' ? 'Viewing request' : 'Message';
 }
+
+export type SenderRole = 'renter' | 'owner';
+
+export interface InquiryMessage {
+  id: string;
+  sender_role: SenderRole;
+  sender_id: string;
+  body: string;
+  created_at: number | null; // epoch ms
+}

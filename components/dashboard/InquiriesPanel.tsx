@@ -8,6 +8,7 @@ import { getMyInquiries } from '@/lib/firestore';
 import { renterStatusLabel, inquiryTypeLabel } from '@/lib/inquiries';
 import { relativeTime } from '@/lib/relative-time';
 import type { Inquiry } from '@/lib/inquiries';
+import { InquiryThread } from '@/components/dashboard/InquiryThread';
 
 const STATUS_STYLE: Record<string, string> = {
   Sent: 'bg-slate-100 text-slate-600',
@@ -19,6 +20,7 @@ export function InquiriesPanel({ filter }: { filter: 'all' | 'viewing' }) {
   const { user } = useAuth();
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [openId, setOpenId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -91,6 +93,20 @@ export function InquiriesPanel({ filter }: { filter: 'all' | 'viewing' }) {
               </span>
             </div>
             {inq.message && <p className="mt-2 line-clamp-2 text-sm text-slate-600">{inq.message}</p>}
+            <button
+              type="button"
+              onClick={() => setOpenId(openId === inq.id ? null : inq.id)}
+              className="mt-2 text-sm font-medium text-blue-600 hover:underline"
+            >
+              {openId === inq.id ? 'Hide conversation' : 'View conversation'}
+            </button>
+            {openId === inq.id && user && (
+              <InquiryThread
+                inquiryId={inq.id}
+                openingMessage={inq.message}
+                currentUserId={user.uid}
+              />
+            )}
           </div>
         );
       })}
