@@ -14,7 +14,7 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 import type { PublicListing, InquiryFormData, InquiryIntent } from './types';
-import type { Inquiry, InquiryStatus } from '@/lib/inquiries';
+import type { Inquiry, InquiryStatus, InquiryMessage, SenderRole } from '@/lib/inquiries';
 import { buildSavedSnapshot, type SavedListing } from './saved-listings';
 import type { MarketplaceFilters } from '@/lib/filter';
 import type { SavedSearch } from '@/lib/saved-searches';
@@ -183,4 +183,32 @@ export async function getRenterProfile(uid: string): Promise<RenterProfile> {
 
 export async function saveRenterProfile(uid: string, data: RenterProfile): Promise<void> {
   await setDoc(doc(db, 'users', uid, 'renter_profile', 'main'), data, { merge: true });
+}
+
+export async function getInquiryMessages(inquiryId: string): Promise<InquiryMessage[]> {
+  const q = query(
+    collection(db, 'listing_inquiries', inquiryId, 'messages'),
+    orderBy('created_at', 'asc'),
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map(d => {
+    const data = d.data();
+    return {
+      id: d.id,
+      sender_role: data.sender_role === 'owner' ? 'owner' : 'renter',
+      sender_id: data.sender_id ?? '',
+      body: data.body ?? '',
+      created_at: data.created_at?.toMillis?.() ?? null,
+    };
+  });
+}
+
+export async function sendInquiryMessage(
+  inquiryId: string,
+  msg: { sender_role: SenderRole; sender_id: string; body: string },
+): Promise<void> {
+  await addDoc(collection(db, 'listing_inquiries', inquiryId, 'messages'), {
+    ...msg,
+    created_at: serverTimestamp(),
+  });
 }
