@@ -60,17 +60,17 @@ export function AvailabilityBadge({
       {open && (
         <span
           onClick={e => { e.preventDefault(); e.stopPropagation(); }}
-          className="absolute right-0 top-full z-50 mt-1 w-44 rounded-xl border border-slate-100 bg-white px-4 py-3 text-center shadow-lg"
+          className="absolute right-0 top-full z-50 mt-1 w-44 rounded-xl border border-white/60 bg-white/75 px-4 py-3 text-center shadow-xl ring-1 ring-black/5 backdrop-blur-md"
         >
-          <span className="block text-[11px] font-medium uppercase tracking-wide text-slate-400">
+          <span className="block text-[11px] font-medium uppercase tracking-wide text-slate-500">
             Availability
           </span>
           {a.freeDate ? (
             <>
-              <span className="block text-base font-bold text-slate-900">
+              <span className="block text-lg font-bold text-slate-900">
                 {a.daysLeft} day{a.daysLeft === 1 ? '' : 's'} left
               </span>
-              <span className="block text-xs text-slate-500">free {a.freeDate}</span>
+              <span className="block text-xs text-slate-600">free {a.freeDate}</span>
             </>
           ) : (
             <span className="block text-base font-bold text-slate-900">Occupied</span>
