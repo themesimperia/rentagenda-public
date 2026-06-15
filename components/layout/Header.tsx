@@ -3,12 +3,12 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Bell, Building2, MessageSquare, Search, X } from 'lucide-react';
+import { Building2, Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth-context';
 import { useAuthModal } from '@/lib/auth-modal-context';
 import { UserMenu } from '@/components/layout/UserMenu';
-import { OWNER_APP_URL } from '@/lib/config';
+import { HeaderNotifications } from '@/components/layout/HeaderNotifications';
 
 const NAV = [
   { href: '/', label: 'Home' },
@@ -84,24 +84,7 @@ export function Header() {
 
           {/* Auth area + icons */}
           <div className="flex shrink-0 items-center gap-1">
-            <a
-              href={`${OWNER_APP_URL}/Inquiries`}
-              target="_blank"
-              rel="noopener noreferrer"
-              title="Messages"
-              className="hidden h-9 w-9 place-items-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 sm:grid"
-            >
-              <MessageSquare className="h-5 w-5" />
-            </a>
-            <a
-              href={OWNER_APP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              title="Notifications"
-              className="hidden h-9 w-9 place-items-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 sm:grid"
-            >
-              <Bell className="h-5 w-5" />
-            </a>
+            {user && <HeaderNotifications />}
             {loading ? (
               <div className="h-8 w-20 animate-pulse rounded-full bg-slate-100" />
             ) : user ? (
