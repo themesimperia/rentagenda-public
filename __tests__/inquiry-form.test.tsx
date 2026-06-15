@@ -5,6 +5,7 @@ const createInquiry = vi.fn();
 vi.mock('@/lib/firestore', () => ({
   createInquiry: (...a: unknown[]) => createInquiry(...a),
 }));
+vi.mock('@/lib/auth-context', () => ({ useAuth: () => ({ user: null }) }));
 
 import { InquiryForm } from '@/components/InquiryForm';
 import type { PublicListing } from '@/lib/types';
@@ -22,7 +23,7 @@ describe('InquiryForm', () => {
     fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'jane@x.com' } });
     fireEvent.click(screen.getByRole('button', { name: /send inquiry/i }));
     await waitFor(() => expect(createInquiry).toHaveBeenCalled());
-    expect(createInquiry).toHaveBeenCalledWith(listing, expect.any(Object), 'viewing');
+    expect(createInquiry).toHaveBeenCalledWith(listing, expect.any(Object), 'viewing', null);
   });
 
   it('defaults intent to message', async () => {
@@ -31,6 +32,6 @@ describe('InquiryForm', () => {
     fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'jane@x.com' } });
     fireEvent.click(screen.getByRole('button', { name: /send inquiry/i }));
     await waitFor(() => expect(createInquiry).toHaveBeenCalled());
-    expect(createInquiry).toHaveBeenCalledWith(listing, expect.any(Object), 'message');
+    expect(createInquiry).toHaveBeenCalledWith(listing, expect.any(Object), 'message', null);
   });
 });
