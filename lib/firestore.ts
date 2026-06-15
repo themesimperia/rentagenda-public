@@ -102,6 +102,7 @@ export async function getMyInquiries(uid: string): Promise<Inquiry[]> {
       message: data.message ?? null,
       status: (data.status ?? 'new') as InquiryStatus,
       created_at: data.created_at?.toMillis?.() ?? null,
+      renter_unread: data.renter_unread ?? false,
     };
   });
 }

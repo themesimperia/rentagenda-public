@@ -12,6 +12,7 @@ export interface Inquiry {
   message: string | null;
   status: InquiryStatus;
   created_at: number | null; // epoch ms
+  renter_unread?: boolean;
 }
 
 /** Owner-side status → renter-facing label. */
