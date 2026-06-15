@@ -1,8 +1,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { MapPin, Bed, Bath, Maximize2 } from 'lucide-react';
-import { propertyTypeLabel, formatPrice, availability } from '@/lib/format';
+import { propertyTypeLabel, formatPrice } from '@/lib/format';
 import { SaveButton } from '@/components/SaveButton';
+import { AvailabilityBadge } from '@/components/AvailabilityBadge';
 import type { PublicListing } from '@/lib/types';
 
 interface ListingCardProps {
@@ -16,7 +17,6 @@ interface ListingCardProps {
 
 export function ListingCard({ listing, onSelect, selected, href }: ListingCardProps) {
   const photo = listing.photos[0];
-  const avail = availability(listing);
 
   const card = (
     <div
@@ -39,15 +39,6 @@ export function ListingCard({ listing, onSelect, selected, href }: ListingCardPr
       {/* Category badge */}
       <span className="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-slate-700 shadow-sm backdrop-blur">
         {propertyTypeLabel(listing.property_type)}
-      </span>
-
-      {/* Availability badge — shifted down to clear the save button overlay */}
-      <span
-        className={`absolute right-3 top-[3.25rem] rounded-full bg-white/95 px-2.5 py-1 text-xs font-semibold shadow-sm backdrop-blur ${
-          avail.tone === 'green' ? 'text-emerald-600' : 'text-amber-600'
-        }`}
-      >
-        {avail.label}
       </span>
 
       {/* Floating info card */}
@@ -110,6 +101,10 @@ export function ListingCard({ listing, onSelect, selected, href }: ListingCardPr
       {/* Save control overlays the card as a sibling so it isn't a button-in-anchor */}
       <div className="absolute right-3 top-3 z-10">
         <SaveButton listing={listing} className="h-8 w-8 shadow-sm" />
+      </div>
+      {/* Availability badge overlay — sibling so its popover escapes overflow-hidden */}
+      <div className="absolute right-3 top-[3.25rem] z-10">
+        <AvailabilityBadge listing={listing} />
       </div>
     </div>
   );
