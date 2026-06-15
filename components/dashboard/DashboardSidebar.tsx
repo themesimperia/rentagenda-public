@@ -24,12 +24,9 @@ const NAV: NavItem[] = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard, exact: true },
   { href: '/dashboard/saved', label: 'Saved', icon: Bookmark },
   { href: '/dashboard/searches', label: 'Searches', icon: SlidersHorizontal },
+  { href: '/dashboard/inquiries', label: 'Inquiries', icon: MessageSquare },
+  { href: '/dashboard/viewings', label: 'Viewings', icon: CalendarClock },
   { href: '/dashboard/profile', label: 'Profile', icon: User },
-];
-
-const SOON: { label: string; icon: LucideIcon }[] = [
-  { label: 'Inquiries', icon: MessageSquare },
-  { label: 'Viewings', icon: CalendarClock },
 ];
 
 export function DashboardSidebar() {
@@ -65,26 +62,6 @@ export function DashboardSidebar() {
           );
         })}
 
-        <p className="mt-4 hidden px-3 text-xs font-semibold uppercase tracking-wider text-slate-400 lg:block">
-          Coming soon
-        </p>
-        {SOON.map(item => {
-          const Icon = item.icon;
-          return (
-            <button
-              key={item.label}
-              type="button"
-              disabled
-              className="flex cursor-not-allowed items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-300"
-            >
-              <Icon className="h-5 w-5 shrink-0" />
-              <span className="hidden lg:inline">{item.label}</span>
-              <span className="ml-auto hidden rounded-full bg-slate-100 px-1.5 py-0.5 text-[10px] text-slate-400 lg:inline">
-                Soon
-              </span>
-            </button>
-          );
-        })}
       </nav>
     </aside>
   );
