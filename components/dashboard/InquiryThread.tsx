@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Loader2, Send, Check, CheckCheck } from 'lucide-react';
 import {
-  collection, query, orderBy, onSnapshot, addDoc, doc, setDoc, serverTimestamp,
+  collection, query, orderBy, onSnapshot, addDoc, doc, setDoc, updateDoc, serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { relativeTime } from '@/lib/relative-time';
@@ -132,6 +132,7 @@ export function InquiryThread({
       { sender_id: currentUserId, at: serverTimestamp() },
       { merge: true },
     ).catch(() => {});
+    updateDoc(doc(db, 'listing_inquiries', inquiryId), { renter_unread: false }).catch(() => {});
   }, [inquiryId, currentUserId, messages.length]);
 
   function onType(value: string) {
