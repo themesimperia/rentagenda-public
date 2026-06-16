@@ -80,6 +80,7 @@ export async function createInquiry(
     created_at: serverTimestamp(),
     status: 'new',
     owner_unread: true,
+    owner_unread_count: 1,
     source: 'public_site',
   });
 }

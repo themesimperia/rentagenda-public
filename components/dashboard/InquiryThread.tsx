@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Loader2, Send, Check, CheckCheck } from 'lucide-react';
 import {
-  collection, query, orderBy, onSnapshot, addDoc, doc, setDoc, updateDoc, serverTimestamp,
+  collection, query, orderBy, onSnapshot, addDoc, doc, setDoc, updateDoc, serverTimestamp, increment,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { relativeTime } from '@/lib/relative-time';
@@ -162,8 +162,12 @@ export function InquiryThread({
         body: text,
         created_at: serverTimestamp(),
       });
-      // Re-flag the thread so the owner gets a fresh "new" badge in App 1.
-      updateDoc(doc(db, 'listing_inquiries', inquiryId), { owner_unread: true }).catch(() => {});
+      // Re-flag the thread so the owner gets a fresh "new" badge in App 1, and
+      // bump the per-message counter so the owner sees how many replies arrived.
+      updateDoc(doc(db, 'listing_inquiries', inquiryId), {
+        owner_unread: true,
+        owner_unread_count: increment(1),
+      }).catch(() => {});
       setBody('');
       setDoc(
         doc(db, 'listing_inquiries', inquiryId, 'typing', myRole),
