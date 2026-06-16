@@ -79,6 +79,7 @@ export async function createInquiry(
     inquiry_type: intent,
     created_at: serverTimestamp(),
     status: 'new',
+    owner_unread: true,
     source: 'public_site',
   });
 }

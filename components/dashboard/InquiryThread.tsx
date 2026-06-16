@@ -159,6 +159,8 @@ export function InquiryThread({
         body: text,
         created_at: serverTimestamp(),
       });
+      // Re-flag the thread so the owner gets a fresh "new" badge in App 1.
+      updateDoc(doc(db, 'listing_inquiries', inquiryId), { owner_unread: true }).catch(() => {});
       setBody('');
       setDoc(
         doc(db, 'listing_inquiries', inquiryId, 'typing', myRole),
