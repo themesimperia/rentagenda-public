@@ -9,6 +9,7 @@ import {
   addDoc,
   setDoc,
   deleteDoc,
+  writeBatch,
   serverTimestamp,
   type DocumentData,
 } from 'firebase/firestore';
@@ -83,6 +84,21 @@ export async function createInquiry(
     owner_unread_count: 1,
     source: 'public_site',
   });
+}
+
+/** Remove one of the renter's inquiries, best-effort clearing its thread first. */
+export async function deleteInquiry(id: string): Promise<void> {
+  try {
+    const msgs = await getDocs(collection(db, 'listing_inquiries', id, 'messages'));
+    if (!msgs.empty) {
+      const batch = writeBatch(db);
+      msgs.forEach(m => batch.delete(m.ref));
+      await batch.commit();
+    }
+  } catch {
+    // Non-fatal: orphaned messages are harmless; proceed to delete the inquiry.
+  }
+  await deleteDoc(doc(db, 'listing_inquiries', id));
 }
 
 export async function getMyInquiries(uid: string): Promise<Inquiry[]> {
