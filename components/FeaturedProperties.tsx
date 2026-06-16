@@ -6,7 +6,7 @@ import Link from 'next/link';
 import {
   MapPin, Bed, Bath, Maximize2, ChevronLeft, ChevronRight, Eye,
 } from 'lucide-react';
-import { propertyTypeLabel, formatPrice } from '@/lib/format';
+import { propertyTypeLabel, formatPrice, maskName } from '@/lib/format';
 import { deriveTypes } from '@/lib/filter';
 import { AvailabilityBadge } from '@/components/AvailabilityBadge';
 import type { PublicListing, PropertyType } from '@/lib/types';
@@ -28,7 +28,8 @@ function initials(name: string): string {
 }
 
 function OwnerFooter({ listing }: { listing: PublicListing }) {
-  const name = listing.owner_name?.trim() || 'Property owner';
+  const rawName = listing.owner_name?.trim();
+  const display = rawName ? maskName(rawName) : 'Property owner';
   return (
     <div className="flex items-center justify-between border-t border-slate-100 px-4 py-3">
       <div className="flex items-center gap-2">
@@ -36,15 +37,15 @@ function OwnerFooter({ listing }: { listing: PublicListing }) {
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={listing.owner_avatar}
-            alt={name}
+            alt={display}
             className="h-7 w-7 rounded-full object-cover"
           />
         ) : (
           <span className="grid h-7 w-7 place-items-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">
-            {initials(name)}
+            {initials(rawName || 'Property owner')}
           </span>
         )}
-        <span className="text-sm font-medium text-slate-600">{name}</span>
+        <span className="text-sm font-medium text-slate-600">{display}</span>
       </div>
       <span className="grid h-7 w-7 place-items-center rounded-full bg-slate-100 text-slate-400 transition-colors group-hover:bg-blue-50 group-hover:text-blue-600">
         <Eye className="h-3.5 w-3.5" />

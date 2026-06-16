@@ -9,7 +9,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { PhotoGallery } from '@/components/PhotoGallery';
 import { InquiryForm } from '@/components/InquiryForm';
-import { propertyTypeLabel, termLabel, formatPrice, availability } from '@/lib/format';
+import { propertyTypeLabel, termLabel, formatPrice, availability, maskName } from '@/lib/format';
 import { PropertyMap } from '@/components/PropertyMap';
 import type { PublicListing } from '@/lib/types';
 
@@ -40,6 +40,7 @@ export function DetailPanel({
   const [intent, setIntent] = useState<'message' | 'viewing'>('message');
   const avail = availability(listing);
   const ownerName = listing.owner_name?.trim();
+  const ownerMasked = ownerName ? maskName(ownerName) : '';
 
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
@@ -198,7 +199,7 @@ export function DetailPanel({
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={listing.owner_avatar}
-              alt={ownerName || 'Owner'}
+              alt={ownerMasked || 'Owner'}
               className="h-9 w-9 rounded-full object-cover"
             />
           ) : (
@@ -209,7 +210,7 @@ export function DetailPanel({
           <div className="min-w-0">
             <p className="text-xs text-slate-400">Listed by</p>
             <p className="truncate text-sm font-semibold text-slate-700">
-              {ownerName || 'Property owner'}
+              {ownerMasked || 'Property owner'}
             </p>
           </div>
         </div>

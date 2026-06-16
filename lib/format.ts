@@ -30,6 +30,22 @@ export function formatPrice(price: number | null, currency: string): string {
   }).format(price);
 }
 
+/**
+ * Masks a display name for public privacy: keeps the first and last letter of
+ * each word and replaces the middle with asterisks ("John Smith" → "J**n S***h").
+ * Words of 1–2 characters are returned unchanged (nothing to safely hide).
+ */
+export function maskName(name: string | null | undefined): string {
+  if (!name) return '';
+  return name
+    .split(/(\s+)/) // keep whitespace separators so spacing is preserved
+    .map(part => {
+      if (part.length <= 2 || /^\s+$/.test(part)) return part;
+      return part[0] + '*'.repeat(part.length - 2) + part[part.length - 1];
+    })
+    .join('');
+}
+
 /** OpenStreetMap embeddable iframe URL with a marker, no API key required. */
 export function mapEmbedUrl(lat: number, lng: number): string {
   const d = 0.01;
