@@ -13,6 +13,8 @@ export interface Inquiry {
   status: InquiryStatus;
   created_at: number | null; // epoch ms
   renter_unread?: boolean;
+  /** Unread owner replies for this inquiry (per message). */
+  renter_unread_count?: number;
 }
 
 /** Owner-side status → renter-facing label. */
