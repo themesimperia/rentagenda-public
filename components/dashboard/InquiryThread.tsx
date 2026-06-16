@@ -132,7 +132,10 @@ export function InquiryThread({
       { sender_id: currentUserId, at: serverTimestamp() },
       { merge: true },
     ).catch(() => {});
-    updateDoc(doc(db, 'listing_inquiries', inquiryId), { renter_unread: false }).catch(() => {});
+    updateDoc(doc(db, 'listing_inquiries', inquiryId), {
+      renter_unread: false,
+      renter_unread_count: 0,
+    }).catch(() => {});
   }, [inquiryId, currentUserId, messages.length]);
 
   function onType(value: string) {

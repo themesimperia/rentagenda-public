@@ -3,9 +3,8 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { MessageSquare, Bell } from 'lucide-react';
-import { useAuth } from '@/lib/auth-context';
-import { getMyInquiries } from '@/lib/firestore';
 import { useSavedListingsData, type SavedRow } from '@/lib/use-saved-listings-data';
+import { useUnreadReplies } from '@/lib/use-unread-replies';
 import { availability } from '@/lib/format';
 
 const SOON_DAYS = 14;
@@ -21,20 +20,10 @@ function CountBadge({ count }: { count: number }) {
 }
 
 export function HeaderNotifications() {
-  const { user } = useAuth();
   const { rows } = useSavedListingsData();
-  const [unreadReplies, setUnreadReplies] = useState(0);
+  const unreadReplies = useUnreadReplies();
   const [bellOpen, setBellOpen] = useState(false);
   const bellRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!user) { setUnreadReplies(0); return; }
-    let active = true;
-    getMyInquiries(user.uid)
-      .then(list => { if (active) setUnreadReplies(list.filter(i => i.renter_unread).length); })
-      .catch(() => {});
-    return () => { active = false; };
-  }, [user]);
 
   useEffect(() => {
     function onDown(e: MouseEvent) {
