@@ -2,10 +2,11 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { SearchX } from 'lucide-react';
+import { FilterSidebar } from '@/components/FilterSidebar';
+import { FilterBar } from '@/components/FilterBar';
 import { ListingCard } from '@/components/ListingCard';
 import { DetailPanel } from '@/components/DetailPanel';
 import { BrowseTopBar, type SortBy, type ViewMode } from '@/components/BrowseTopBar';
-import { FilterDrawer } from '@/components/FilterDrawer';
 import {
   type MarketplaceFilters,
   EMPTY_FILTERS,
@@ -19,7 +20,6 @@ import type { PublicListing } from '@/lib/types';
 
 const PAGE_SIZE = 9;
 
-/** Sort key: available now = 0, frees up in N days = N, occupied/unknown = last. */
 function availabilityRank(l: PublicListing): number {
   const a = availability(l);
   if (a.available) return 0;
@@ -58,7 +58,7 @@ export function MarketplaceDashboard({
   const [view, setView] = useState<ViewMode>('grid');
   const [cols, setCols] = useState<2 | 3>(2);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [filterBarOpen, setFilterBarOpen] = useState(false);
 
   const locations = useMemo(() => deriveLocations(listings), [listings]);
   const types = useMemo(() => deriveTypes(listings), [listings]);
@@ -69,31 +69,52 @@ export function MarketplaceDashboard({
     [listings, filters, sortBy],
   );
 
-  // Reset to the first page whenever the result set changes.
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
   }, [filters, sortBy]);
 
   const visible = filtered.slice(0, visibleCount);
-
-  const selected =
-    filtered.find(l => l.id === selectedId) ?? null;
+  const selected = filtered.find(l => l.id === selectedId) ?? null;
 
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="px-4 py-6 sm:px-6">
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_420px]">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[260px_1fr] xl:grid-cols-[260px_1fr_420px]">
+
+          {/* ── Left sidebar ─────────────────────────────────────── */}
+          <aside className="lg:sticky lg:top-20 lg:self-start">
+            <FilterSidebar
+              filters={filters}
+              onChange={setFilters}
+              locations={locations}
+              types={types}
+              amenities={amenities}
+            />
+          </aside>
 
           {/* ── Listing area ─────────────────────────────────────── */}
           <div className="space-y-4">
             {/* Page title */}
             <h1 className="text-xl font-bold text-slate-900">Browse properties</h1>
 
-            {/* Top bar: Filters button + result count + view toggles */}
+            {/* Collapsible filter bar — slides in above the results */}
+            {filterBarOpen && (
+              <FilterBar
+                value={filters}
+                onApply={setFilters}
+                types={types}
+                amenities={amenities}
+                sortBy={sortBy}
+                onSortChange={setSortBy}
+              />
+            )}
+
+            {/* Results row: Filters toggle + count + view controls */}
             <BrowseTopBar
               filters={filters}
               onFiltersChange={setFilters}
-              onFiltersOpen={() => setDrawerOpen(true)}
+              onFiltersOpen={() => setFilterBarOpen(o => !o)}
+              filterBarOpen={filterBarOpen}
               resultCount={filtered.length}
               loading={false}
               view={view}
@@ -131,7 +152,6 @@ export function MarketplaceDashboard({
                 ))}
               </div>
             ) : (
-              /* List view — compact horizontal rows */
               <div className="space-y-3">
                 {visible.map(listing => (
                   <ListingCard
@@ -162,7 +182,7 @@ export function MarketplaceDashboard({
           </div>
 
           {/* ── Detail panel ─────────────────────────────────────── */}
-          <aside className="xl:sticky xl:top-20 xl:self-start">
+          <aside className="lg:col-span-2 xl:col-span-1 xl:sticky xl:top-20 xl:self-start">
             {selected ? (
               <DetailPanel listing={selected} permalink={`/listing/${selected.id}`} />
             ) : (
@@ -173,20 +193,6 @@ export function MarketplaceDashboard({
           </aside>
         </div>
       </div>
-
-      {/* Filter drawer */}
-      <FilterDrawer
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        filters={filters}
-        onChange={setFilters}
-        locations={locations}
-        types={types}
-        amenities={amenities}
-        sortBy={sortBy}
-        onSortChange={setSortBy}
-        resultCount={filtered.length}
-      />
     </div>
   );
 }

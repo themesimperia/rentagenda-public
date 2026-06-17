@@ -10,6 +10,7 @@ interface BrowseTopBarProps {
   filters: MarketplaceFilters;
   onFiltersChange: (f: MarketplaceFilters) => void;
   onFiltersOpen: () => void;
+  filterBarOpen: boolean;
   resultCount: number;
   loading: boolean;
   view: ViewMode;
@@ -22,6 +23,7 @@ export function BrowseTopBar({
   filters,
   onFiltersChange,
   onFiltersOpen,
+  filterBarOpen,
   resultCount,
   loading,
   view,
@@ -75,12 +77,13 @@ export function BrowseTopBar({
 
       {/* ── Filters button + results count (left) + view controls (right) ── */}
       <div className="flex flex-wrap items-center gap-2">
-        {/* Filters button */}
+        {/* Filters button — blue when panel is open OR filters active */}
         <button
           type="button"
           onClick={onFiltersOpen}
+          aria-expanded={filterBarOpen}
           className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
-            activeCount > 0
+            filterBarOpen || activeCount > 0
               ? 'border-blue-200 bg-blue-50 text-blue-700'
               : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
           }`}
