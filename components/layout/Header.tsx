@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Building2, Search, X } from 'lucide-react';
+import { Building2, Search, X, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth-context';
 import { useAuthModal } from '@/lib/auth-modal-context';
+import { useLocations } from '@/lib/use-locations';
 import { UserMenu } from '@/components/layout/UserMenu';
 import { HeaderNotifications } from '@/components/layout/HeaderNotifications';
 
@@ -15,19 +16,72 @@ const NAV = [
   { href: '/listings', label: 'Browse' },
 ];
 
+/** Wraps the matching substring in a bold blue span. */
+function HighlightMatch({ text, query }: { text: string; query: string }) {
+  const q = query.trim();
+  if (!q) return <>{text}</>;
+  const idx = text.toLowerCase().indexOf(q.toLowerCase());
+  if (idx === -1) return <>{text}</>;
+  return (
+    <>
+      {text.slice(0, idx)}
+      <span className="font-bold text-blue-600">{text.slice(idx, idx + q.length)}</span>
+      {text.slice(idx + q.length)}
+    </>
+  );
+}
+
 export function Header() {
   const { user, loading } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
   const { openAuth } = useAuthModal();
   const [search, setSearch] = useState('');
+  const [open, setOpen] = useState(false);
+  const [activeIdx, setActiveIdx] = useState(-1);
+  const searchRef = useRef<HTMLFormElement>(null);
+  const locations = useLocations();
 
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const suggestions = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return [];
+    return locations.filter(loc => loc.toLowerCase().includes(q)).slice(0, 8);
+  }, [search, locations]);
+
+  // Hooks must run before any early return.
   if (pathname.startsWith('/dashboard')) return null;
+
+  function go(q: string) {
+    const trimmed = q.trim();
+    setOpen(false);
+    router.push(trimmed ? `/listings?q=${encodeURIComponent(trimmed)}` : '/listings');
+  }
 
   function submitSearch(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const q = search.trim();
-    router.push(q ? `/listings?q=${encodeURIComponent(q)}` : '/listings');
+    if (activeIdx >= 0 && suggestions[activeIdx]) { setSearch(suggestions[activeIdx]); go(suggestions[activeIdx]); }
+    else go(search);
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (!open || suggestions.length === 0) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveIdx(i => (i + 1) % suggestions.length);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveIdx(i => (i <= 0 ? suggestions.length - 1 : i - 1));
+    } else if (e.key === 'Escape') {
+      setOpen(false);
+    }
   }
 
   return (
@@ -59,20 +113,25 @@ export function Header() {
             })}
           </nav>
 
-          {/* Search */}
-          <form onSubmit={submitSearch} className="hidden flex-1 lg:block lg:max-w-sm">
+          {/* Search with location autocomplete */}
+          <form onSubmit={submitSearch} ref={searchRef} className="relative hidden flex-1 lg:block lg:max-w-sm">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <input
                 value={search}
-                onChange={e => setSearch(e.target.value)}
+                onChange={e => { setSearch(e.target.value); setOpen(true); setActiveIdx(-1); }}
+                onFocus={() => { if (search) setOpen(true); }}
+                onKeyDown={handleKeyDown}
                 placeholder="Search listings…"
+                aria-label="Search listings"
+                aria-autocomplete="list"
+                aria-expanded={open && suggestions.length > 0}
                 className="w-full rounded-full border border-slate-200 bg-slate-50 py-2 pl-9 pr-9 text-sm text-slate-700 placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:outline-none"
               />
               {search && (
                 <button
                   type="button"
-                  onClick={() => setSearch('')}
+                  onClick={() => { setSearch(''); setOpen(false); }}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                   aria-label="Clear search"
                 >
@@ -80,6 +139,30 @@ export function Header() {
                 </button>
               )}
             </div>
+
+            {/* Suggestions dropdown */}
+            {open && suggestions.length > 0 && (
+              <ul
+                role="listbox"
+                className="absolute left-0 right-0 top-full z-50 mt-1.5 overflow-hidden rounded-2xl border border-slate-100 bg-white py-1 shadow-xl"
+              >
+                {suggestions.map((loc, i) => (
+                  <li key={loc} role="option" aria-selected={i === activeIdx}>
+                    <button
+                      type="button"
+                      onMouseEnter={() => setActiveIdx(i)}
+                      onMouseDown={e => { e.preventDefault(); setSearch(loc); go(loc); }}
+                      className={`flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm transition-colors ${
+                        i === activeIdx ? 'bg-blue-50 text-blue-700' : 'text-slate-700 hover:bg-slate-50'
+                      }`}
+                    >
+                      <MapPin className="h-4 w-4 shrink-0 text-blue-500" />
+                      <HighlightMatch text={loc} query={search} />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </form>
 
           {/* Auth area + icons */}
