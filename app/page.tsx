@@ -31,7 +31,7 @@ export default async function HomePage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative isolate overflow-hidden">
+      <section className="relative isolate">
         <div
           className="absolute inset-0 -z-10 bg-slate-800 bg-cover bg-center"
           style={{ backgroundImage: `url(${HERO_BG})` }}
