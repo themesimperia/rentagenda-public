@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Building2, Search, X, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth-context';
 import { useAuthModal } from '@/lib/auth-modal-context';
-import { useLocations } from '@/lib/use-locations';
+import { useSearchSuggestions } from '@/lib/use-search-suggestions';
 import { UserMenu } from '@/components/layout/UserMenu';
 import { HeaderNotifications } from '@/components/layout/HeaderNotifications';
 
@@ -40,7 +40,7 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const [activeIdx, setActiveIdx] = useState(-1);
   const searchRef = useRef<HTMLFormElement>(null);
-  const locations = useLocations();
+  const suggestions = useSearchSuggestions(search);
 
   useEffect(() => {
     function handler(e: MouseEvent) {
@@ -49,12 +49,6 @@ export function Header() {
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
-
-  const suggestions = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) return [];
-    return locations.filter(loc => loc.toLowerCase().includes(q)).slice(0, 8);
-  }, [search, locations]);
 
   // Hooks must run before any early return.
   if (pathname.startsWith('/dashboard')) return null;
@@ -67,7 +61,8 @@ export function Header() {
 
   function submitSearch(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (activeIdx >= 0 && suggestions[activeIdx]) { setSearch(suggestions[activeIdx]); go(suggestions[activeIdx]); }
+    const picked = activeIdx >= 0 ? suggestions[activeIdx] : undefined;
+    if (picked) { setSearch(picked.label); go(picked.label); }
     else go(search);
   }
 
@@ -146,18 +141,27 @@ export function Header() {
                 role="listbox"
                 className="absolute left-0 right-0 top-full z-50 mt-1.5 overflow-hidden rounded-2xl border border-slate-100 bg-white py-1 shadow-xl"
               >
-                {suggestions.map((loc, i) => (
-                  <li key={loc} role="option" aria-selected={i === activeIdx}>
+                {suggestions.map((s, i) => (
+                  <li key={`${s.kind}:${s.label}`} role="option" aria-selected={i === activeIdx}>
                     <button
                       type="button"
                       onMouseEnter={() => setActiveIdx(i)}
-                      onMouseDown={e => { e.preventDefault(); setSearch(loc); go(loc); }}
+                      onMouseDown={e => { e.preventDefault(); setSearch(s.label); go(s.label); }}
                       className={`flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm transition-colors ${
                         i === activeIdx ? 'bg-blue-50 text-blue-700' : 'text-slate-700 hover:bg-slate-50'
                       }`}
                     >
-                      <MapPin className="h-4 w-4 shrink-0 text-blue-500" />
-                      <HighlightMatch text={loc} query={search} />
+                      {s.kind === 'location' ? (
+                        <MapPin className="h-4 w-4 shrink-0 text-blue-500" />
+                      ) : (
+                        <Building2 className="h-4 w-4 shrink-0 text-slate-400" />
+                      )}
+                      <span className="min-w-0 flex-1 truncate">
+                        <HighlightMatch text={s.label} query={search} />
+                      </span>
+                      <span className="shrink-0 text-[11px] font-medium uppercase tracking-wide text-slate-300">
+                        {s.kind === 'location' ? 'Area' : 'Listing'}
+                      </span>
                     </button>
                   </li>
                 ))}
