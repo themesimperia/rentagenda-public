@@ -146,7 +146,7 @@ export function FilterBar({ value, onApply, types, amenities, sortBy, onSortChan
       </FilterPopover>
 
       {/* Property type */}
-      <FilterPopover label="Property Type" active={draft.types.length > 0} count={draft.types.length}>
+      <FilterPopover label="Property Type" active={draft.types.length > 0}>
         {() => (
           <div className="px-2 py-1">
             {types.map(t => (
@@ -245,7 +245,7 @@ export function FilterBar({ value, onApply, types, amenities, sortBy, onSortChan
       </FilterPopover>
 
       {/* Features (amenities) */}
-      <FilterPopover label="Features" active={draft.amenities.length > 0} count={draft.amenities.length}>
+      <FilterPopover label="Features" active={draft.amenities.length > 0}>
         {() => (
           <div className="max-h-64 w-56 overflow-y-auto px-2 py-1">
             {amenities.length === 0 ? (
@@ -268,7 +268,7 @@ export function FilterBar({ value, onApply, types, amenities, sortBy, onSortChan
       </FilterPopover>
 
       {/* More (size) */}
-      <FilterPopover label="More" active={sizeCount > 0} count={sizeCount}>
+      <FilterPopover label="More" active={sizeCount > 0}>
         {() => (
           <div className="w-56 px-3 py-2">
             <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Size (m²)</p>
