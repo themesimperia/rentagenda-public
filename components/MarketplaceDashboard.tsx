@@ -151,12 +151,13 @@ export function MarketplaceDashboard({
                 ))}
               </div>
             ) : (
-              /* List view — single column with more info */
+              /* List view — compact horizontal rows */
               <div className="space-y-3">
                 {visible.map(listing => (
                   <ListingCard
                     key={listing.id}
                     listing={listing}
+                    layout="list"
                     selected={selected?.id === listing.id}
                     onSelect={l => setSelectedId(l.id)}
                   />
