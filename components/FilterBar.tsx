@@ -83,28 +83,17 @@ export function FilterBar({ value, onApply, types, amenities, sortBy, onSortChan
     setDraft(d => ({ ...d, [key]: v }));
   }
 
+  // Labels stay fixed (the filter's name) so selecting a value never widens a
+  // button and pushes the row to wrap. Selection is shown via the active
+  // highlight + count badges instead.
   const termValue: RentalTerm | 'all' = draft.terms.length === 1 ? draft.terms[0] : 'all';
-  const bedsLabel =
-    draft.bedroomsMin == null
-      ? 'Beds'
-      : draft.bedroomsMin === 0
-        ? 'Studio'
-        : `${draft.bedroomsMin}+ Beds`;
-  const typeLabel = draft.types.length ? `Type · ${draft.types.length}` : 'Property Type';
   const priceActive = draft.priceMin != null || draft.priceMax != null;
-  const priceLabel = priceActive
-    ? `$${draft.priceMin ?? 0} – ${draft.priceMax != null ? `$${draft.priceMax}` : 'Any'}`
-    : 'Price';
   const sizeCount = (draft.sizeMin != null ? 1 : 0) + (draft.sizeMax != null ? 1 : 0);
-  const availLabel =
-    draft.availabilityWithin == null
-      ? 'Availability'
-      : AVAILABILITY_OPTIONS.find(o => o.value === draft.availabilityWithin)?.label ?? 'Availability';
 
   return (
     <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-slate-100 bg-white p-2 shadow-sm">
       {/* Rent (term) */}
-      <FilterPopover label={termValue === 'all' ? 'Rent' : termLabel(termValue)} active={draft.terms.length > 0}>
+      <FilterPopover label="Rent" active={draft.terms.length > 0}>
         {close => (
           <>
             <button
@@ -141,7 +130,7 @@ export function FilterBar({ value, onApply, types, amenities, sortBy, onSortChan
       </div>
 
       {/* Beds */}
-      <FilterPopover label={bedsLabel} active={draft.bedroomsMin != null}>
+      <FilterPopover label="Beds" active={draft.bedroomsMin != null}>
         {close =>
           BEDS.map(b => (
             <button
@@ -157,7 +146,7 @@ export function FilterBar({ value, onApply, types, amenities, sortBy, onSortChan
       </FilterPopover>
 
       {/* Property type */}
-      <FilterPopover label={typeLabel} active={draft.types.length > 0}>
+      <FilterPopover label="Property Type" active={draft.types.length > 0} count={draft.types.length}>
         {() => (
           <div className="px-2 py-1">
             {types.map(t => (
@@ -176,7 +165,7 @@ export function FilterBar({ value, onApply, types, amenities, sortBy, onSortChan
       </FilterPopover>
 
       {/* Price */}
-      <FilterPopover label={priceLabel} active={priceActive}>
+      <FilterPopover label="Price" active={priceActive}>
         {close => (
           <div className="w-60 px-2 py-1">
             {PRICE_PRESETS.map(p => (
@@ -215,7 +204,7 @@ export function FilterBar({ value, onApply, types, amenities, sortBy, onSortChan
 
       {/* Availability — occupancy window filter + soonest-available sort */}
       <FilterPopover
-        label={availLabel}
+        label="Availability"
         active={draft.availabilityWithin != null || sortBy === 'available_soon'}
       >
         {close => (
