@@ -106,6 +106,8 @@ export function MarketplaceDashboard({
               onApply={setFilters}
               types={types}
               amenities={amenities}
+              sortBy={sortBy}
+              onSortChange={setSortBy}
             />
 
             {/* Top filter bar */}

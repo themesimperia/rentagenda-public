@@ -21,7 +21,6 @@ const SORT_OPTIONS: { label: string; value: SortBy }[] = [
   { label: 'Newest', value: 'newest' },
   { label: 'Price: Low – High', value: 'price_asc' },
   { label: 'Price: High – Low', value: 'price_desc' },
-  { label: 'Available Soonest', value: 'available_soon' },
 ];
 
 
@@ -50,7 +49,11 @@ export function BrowseTopBar({
   cols,
   onColsChange,
 }: BrowseTopBarProps) {
-  const sortLabel = SORT_OPTIONS.find(o => o.value === sortBy)?.label ?? 'Sort by';
+  // 'available_soon' is controlled from the Availability filter, not this list.
+  const sortLabel =
+    sortBy === 'available_soon'
+      ? 'Available Soonest'
+      : SORT_OPTIONS.find(o => o.value === sortBy)?.label ?? 'Sort by';
   const bedsLabel =
     filters.bedroomsMin != null ? `${filters.bedroomsMin}+ Bedrooms` : 'Bedrooms';
 

@@ -9,6 +9,7 @@ import { saveSearch } from '@/lib/firestore';
 import { useAuth } from '@/lib/auth-context';
 import { useAuthModal } from '@/lib/auth-modal-context';
 import type { MarketplaceFilters } from '@/lib/filter';
+import type { SortBy } from '@/components/BrowseTopBar';
 import type { PropertyType, RentalTerm } from '@/lib/types';
 
 const TERMS: RentalTerm[] = ['long_term', 'short_term'];
@@ -46,9 +47,11 @@ interface FilterBarProps {
   onApply: (f: MarketplaceFilters) => void;
   types: PropertyType[];
   amenities: string[];
+  sortBy: SortBy;
+  onSortChange: (s: SortBy) => void;
 }
 
-export function FilterBar({ value, onApply, types, amenities }: FilterBarProps) {
+export function FilterBar({ value, onApply, types, amenities, sortBy, onSortChange }: FilterBarProps) {
   const [draft, setDraft] = useState<MarketplaceFilters>(value);
   // Re-seed the draft whenever the committed filters change so the bar reflects
   // live sidebar edits. Trade-off: editing the sidebar mid-edit discards any
@@ -99,7 +102,7 @@ export function FilterBar({ value, onApply, types, amenities }: FilterBarProps) 
       : AVAILABILITY_OPTIONS.find(o => o.value === draft.availabilityWithin)?.label ?? 'Availability';
 
   return (
-    <div className="flex flex-wrap items-center gap-2 overflow-x-auto rounded-2xl border border-slate-100 bg-white p-2 shadow-sm">
+    <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-slate-100 bg-white p-2 shadow-sm">
       {/* Rent (term) */}
       <FilterPopover label={termValue === 'all' ? 'Rent' : termLabel(termValue)} active={draft.terms.length > 0}>
         {close => (
@@ -210,20 +213,46 @@ export function FilterBar({ value, onApply, types, amenities }: FilterBarProps) 
         )}
       </FilterPopover>
 
-      {/* Availability (occupation expiry window) */}
-      <FilterPopover label={availLabel} active={draft.availabilityWithin != null}>
-        {close =>
-          AVAILABILITY_OPTIONS.map(o => (
+      {/* Availability — occupancy window filter + soonest-available sort */}
+      <FilterPopover
+        label={availLabel}
+        active={draft.availabilityWithin != null || sortBy === 'available_soon'}
+      >
+        {close => (
+          <div className="w-56">
+            <p className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-slate-400">Show</p>
+            {AVAILABILITY_OPTIONS.map(o => (
+              <button
+                key={o.label}
+                type="button"
+                onClick={() => {
+                  // Apply immediately so the single-select takes effect without "Apply".
+                  const next = { ...draft, availabilityWithin: o.value };
+                  setDraft(next);
+                  onApply(next);
+                  close();
+                }}
+                className={`flex w-full items-center justify-between px-4 py-2 text-sm hover:bg-slate-50 ${draft.availabilityWithin === o.value ? 'font-semibold text-blue-600' : 'text-slate-700'}`}
+              >
+                {o.label}
+                {draft.availabilityWithin === o.value && <span className="h-2 w-2 rounded-full bg-blue-600" />}
+              </button>
+            ))}
+            <div className="my-1 border-t border-slate-100" />
+            <p className="px-3 pb-1 pt-1 text-[11px] font-semibold uppercase tracking-wide text-slate-400">Sort</p>
             <button
-              key={o.label}
               type="button"
-              onClick={() => { set('availabilityWithin', o.value); close(); }}
-              className={`flex w-full px-4 py-2 text-sm hover:bg-slate-50 ${draft.availabilityWithin === o.value ? 'font-semibold text-blue-600' : 'text-slate-700'}`}
+              onClick={() => {
+                onSortChange(sortBy === 'available_soon' ? 'relevant' : 'available_soon');
+                close();
+              }}
+              className={`flex w-full items-center justify-between px-4 py-2 text-sm hover:bg-slate-50 ${sortBy === 'available_soon' ? 'font-semibold text-blue-600' : 'text-slate-700'}`}
             >
-              {o.label}
+              Available soonest first
+              {sortBy === 'available_soon' && <span className="h-2 w-2 rounded-full bg-blue-600" />}
             </button>
-          ))
-        }
+          </div>
+        )}
       </FilterPopover>
 
       {/* Features (amenities) */}
