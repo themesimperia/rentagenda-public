@@ -116,8 +116,6 @@ export function MarketplaceDashboard({
               onFiltersChange={setFilters}
               resultCount={filtered.length}
               loading={false}
-              sortBy={sortBy}
-              onSortChange={setSortBy}
               view={view}
               onViewChange={setView}
               cols={cols}

@@ -1,36 +1,16 @@
 'use client';
 
-import { useState } from 'react';
 import { X, LayoutGrid, List } from 'lucide-react';
-import { FilterPopover } from '@/components/ui/FilterPopover';
 import { type MarketplaceFilters, EMPTY_FILTERS, isFiltered } from '@/lib/filter';
 
 export type SortBy = 'relevant' | 'newest' | 'price_asc' | 'price_desc' | 'available_soon';
 export type ViewMode = 'grid' | 'list';
-
-const BEDS_OPTIONS: { label: string; value: number | null }[] = [
-  { label: 'Any', value: null },
-  { label: '1+', value: 1 },
-  { label: '2+', value: 2 },
-  { label: '3+', value: 3 },
-  { label: '4+', value: 4 },
-];
-
-const SORT_OPTIONS: { label: string; value: SortBy }[] = [
-  { label: 'Relevant', value: 'relevant' },
-  { label: 'Newest', value: 'newest' },
-  { label: 'Price: Low – High', value: 'price_asc' },
-  { label: 'Price: High – Low', value: 'price_desc' },
-];
-
 
 interface BrowseTopBarProps {
   filters: MarketplaceFilters;
   onFiltersChange: (f: MarketplaceFilters) => void;
   resultCount: number;
   loading: boolean;
-  sortBy: SortBy;
-  onSortChange: (s: SortBy) => void;
   view: ViewMode;
   onViewChange: (v: ViewMode) => void;
   cols: 2 | 3;
@@ -42,21 +22,11 @@ export function BrowseTopBar({
   onFiltersChange,
   resultCount,
   loading,
-  sortBy,
-  onSortChange,
   view,
   onViewChange,
   cols,
   onColsChange,
 }: BrowseTopBarProps) {
-  // 'available_soon' is controlled from the Availability filter, not this list.
-  const sortLabel =
-    sortBy === 'available_soon'
-      ? 'Available Soonest'
-      : SORT_OPTIONS.find(o => o.value === sortBy)?.label ?? 'Sort by';
-  const bedsLabel =
-    filters.bedroomsMin != null ? `${filters.bedroomsMin}+ Bedrooms` : 'Bedrooms';
-
   function removeLocation(loc: string) {
     onFiltersChange({
       ...filters,
@@ -85,32 +55,6 @@ export function BrowseTopBar({
             </button>
           </span>
         ))}
-
-        {/* Beds & Bath */}
-        <FilterPopover label={bedsLabel} active={filters.bedroomsMin != null}>
-          {close => (
-            <>
-              {BEDS_OPTIONS.map(opt => (
-                <button
-                  key={opt.label}
-                  type="button"
-                  onClick={() => {
-                    onFiltersChange({ ...filters, bedroomsMin: opt.value });
-                    close();
-                  }}
-                  className={`flex w-full items-center justify-between px-4 py-2 text-sm transition-colors hover:bg-slate-50 ${
-                    filters.bedroomsMin === opt.value ? 'font-semibold text-blue-600' : 'text-slate-700'
-                  }`}
-                >
-                  {opt.label}
-                  {filters.bedroomsMin === opt.value && (
-                    <span className="h-2 w-2 rounded-full bg-blue-600" />
-                  )}
-                </button>
-              ))}
-            </>
-          )}
-        </FilterPopover>
 
         {/* Clear all — only shown when filters are active */}
         {isFiltered(filters) && (
@@ -171,34 +115,13 @@ export function BrowseTopBar({
         </div>
       </div>
 
-      {/* ── Results + sort row ──────────────────────────────────── */}
-      <div className="flex items-center gap-2 text-sm text-slate-500">
-        {!loading && (
-          <span>
-            <strong className="text-slate-800">{resultCount}</strong>{' '}
-            {resultCount === 1 ? 'property' : 'properties'} found
-          </span>
-        )}
-        <span className="text-slate-300">·</span>
-        <span>Sort by</span>
-        <FilterPopover label={sortLabel}>
-          {close =>
-            SORT_OPTIONS.map(opt => (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => { onSortChange(opt.value); close(); }}
-                className={`flex w-full items-center justify-between px-4 py-2 text-sm transition-colors hover:bg-slate-50 ${
-                  sortBy === opt.value ? 'font-semibold text-blue-600' : 'text-slate-700'
-                }`}
-              >
-                {opt.label}
-                {sortBy === opt.value && <span className="h-2 w-2 rounded-full bg-blue-600" />}
-              </button>
-            ))
-          }
-        </FilterPopover>
-      </div>
+      {/* ── Results count ───────────────────────────────────────── */}
+      {!loading && (
+        <div className="text-sm text-slate-500">
+          <strong className="text-slate-800">{resultCount}</strong>{' '}
+          {resultCount === 1 ? 'property' : 'properties'} found
+        </div>
+      )}
     </div>
   );
 }
