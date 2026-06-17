@@ -1,5 +1,6 @@
 import { ShieldCheck, BadgeDollarSign, MessageSquare, Building2 } from 'lucide-react';
 import { HeroSearch } from '@/components/HeroSearch';
+import { HeroLocationSearch } from '@/components/HeroLocationSearch';
 import { FeaturedProperties } from '@/components/FeaturedProperties';
 import { HowItWorks } from '@/components/home/HowItWorks';
 import { BrowseByCity } from '@/components/home/BrowseByCity';
@@ -39,6 +40,11 @@ export default async function HomePage() {
         <div className="absolute inset-0 -z-10 bg-slate-900/60" />
 
         <div className="mx-auto max-w-4xl px-4 py-12 text-center sm:px-6 sm:py-16">
+          {/* Quick location search — sits above the headline */}
+          <div className="mb-8">
+            <HeroLocationSearch regions={regions} />
+          </div>
+
           <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
             Find Your Next Home
           </h1>
