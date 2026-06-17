@@ -1,7 +1,7 @@
 'use client';
 
-import { X, LayoutGrid, List } from 'lucide-react';
-import { type MarketplaceFilters, EMPTY_FILTERS, isFiltered } from '@/lib/filter';
+import { X, LayoutGrid, List, SlidersHorizontal } from 'lucide-react';
+import { type MarketplaceFilters, EMPTY_FILTERS, isFiltered, countActiveFilters } from '@/lib/filter';
 
 export type SortBy = 'relevant' | 'newest' | 'price_asc' | 'price_desc' | 'available_soon';
 export type ViewMode = 'grid' | 'list';
@@ -9,6 +9,7 @@ export type ViewMode = 'grid' | 'list';
 interface BrowseTopBarProps {
   filters: MarketplaceFilters;
   onFiltersChange: (f: MarketplaceFilters) => void;
+  onFiltersOpen: () => void;
   resultCount: number;
   loading: boolean;
   view: ViewMode;
@@ -20,6 +21,7 @@ interface BrowseTopBarProps {
 export function BrowseTopBar({
   filters,
   onFiltersChange,
+  onFiltersOpen,
   resultCount,
   loading,
   view,
@@ -27,6 +29,7 @@ export function BrowseTopBar({
   cols,
   onColsChange,
 }: BrowseTopBarProps) {
+  const activeCount = countActiveFilters(filters);
   function removeLocation(loc: string) {
     onFiltersChange({
       ...filters,
@@ -70,8 +73,27 @@ export function BrowseTopBar({
         </div>
       )}
 
-      {/* ── Results count (left) + view controls (right) ────────── */}
+      {/* ── Filters button + results count (left) + view controls (right) ── */}
       <div className="flex flex-wrap items-center gap-2">
+        {/* Filters button */}
+        <button
+          type="button"
+          onClick={onFiltersOpen}
+          className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
+            activeCount > 0
+              ? 'border-blue-200 bg-blue-50 text-blue-700'
+              : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+          }`}
+        >
+          <SlidersHorizontal className="h-4 w-4" />
+          Filters
+          {activeCount > 0 && (
+            <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-blue-600 px-1.5 text-[11px] font-semibold text-white">
+              {activeCount}
+            </span>
+          )}
+        </button>
+
         {!loading && (
           <div className="text-sm text-slate-500">
             <strong className="text-slate-800">{resultCount}</strong>{' '}

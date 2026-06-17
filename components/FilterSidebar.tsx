@@ -153,9 +153,11 @@ interface FilterSidebarProps {
   locations: string[];
   types: PropertyType[];
   amenities: string[];
+  /** When true, omits the outer card wrapper and header — for use inside a drawer. */
+  bare?: boolean;
 }
 
-export function FilterSidebar({ filters, onChange, locations, types, amenities }: FilterSidebarProps) {
+export function FilterSidebar({ filters, onChange, locations, types, amenities, bare = false }: FilterSidebarProps) {
   function set<K extends keyof MarketplaceFilters>(key: K, value: MarketplaceFilters[K]) {
     onChange({ ...filters, [key]: value });
   }
@@ -170,22 +172,8 @@ export function FilterSidebar({ filters, onChange, locations, types, amenities }
   const sliderMin = fmt(filters.priceMin, 0);
   const sliderMax = fmt(filters.priceMax, PRICE_MAX);
 
-  return (
-    <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-4">
-        <h2 className="text-base font-bold text-slate-900">Custom Filter</h2>
-        {isFiltered(filters) && (
-          <button
-            type="button"
-            onClick={() => onChange(EMPTY_FILTERS)}
-            className="text-xs font-semibold text-blue-600 hover:underline"
-          >
-            Clear all
-          </button>
-        )}
-      </div>
-
+  const sections = (
+    <>
       {/* Location */}
       {locations.length > 0 && (
         <Section
@@ -386,6 +374,27 @@ export function FilterSidebar({ filters, onChange, locations, types, amenities }
           </div>
         </Section>
       )}
+    </>
+  );
+
+  if (bare) return sections;
+
+  return (
+    <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-4">
+        <h2 className="text-base font-bold text-slate-900">Custom Filter</h2>
+        {isFiltered(filters) && (
+          <button
+            type="button"
+            onClick={() => onChange(EMPTY_FILTERS)}
+            className="text-xs font-semibold text-blue-600 hover:underline"
+          >
+            Clear all
+          </button>
+        )}
+      </div>
+      {sections}
     </div>
   );
 }

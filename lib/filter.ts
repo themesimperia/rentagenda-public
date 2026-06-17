@@ -101,3 +101,17 @@ export function isFiltered(f: MarketplaceFilters): boolean {
     f.availabilityWithin != null
   );
 }
+
+export function countActiveFilters(f: MarketplaceFilters): number {
+  let n = 0;
+  if (f.search) n++;
+  if (f.locations.length) n++;
+  if (f.types.length) n++;
+  if (f.terms.length) n++;
+  if (f.amenities.length) n++;
+  if (f.priceMin != null || f.priceMax != null) n++;
+  if (f.sizeMin != null || f.sizeMax != null) n++;
+  if (f.bedroomsMin != null) n++;
+  if (f.availabilityWithin != null) n++;
+  return n;
+}
