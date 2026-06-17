@@ -29,6 +29,14 @@ const PRICE_PRESETS: { label: string; min: number | null; max: number | null }[]
   { label: 'Over $3,500', min: 3500, max: null },
 ];
 
+const AVAILABILITY_OPTIONS: { label: string; value: number | null }[] = [
+  { label: 'Any time', value: null },
+  { label: 'Available now', value: 0 },
+  { label: 'Within 30 days', value: 30 },
+  { label: 'Within 60 days', value: 60 },
+  { label: 'Within 90 days', value: 90 },
+];
+
 function toggle<T>(arr: T[], v: T): T[] {
   return arr.includes(v) ? arr.filter(x => x !== v) : [...arr, v];
 }
@@ -85,6 +93,10 @@ export function FilterBar({ value, onApply, types, amenities }: FilterBarProps) 
     ? `$${draft.priceMin ?? 0} – ${draft.priceMax != null ? `$${draft.priceMax}` : 'Any'}`
     : 'Price';
   const sizeCount = (draft.sizeMin != null ? 1 : 0) + (draft.sizeMax != null ? 1 : 0);
+  const availLabel =
+    draft.availabilityWithin == null
+      ? 'Availability'
+      : AVAILABILITY_OPTIONS.find(o => o.value === draft.availabilityWithin)?.label ?? 'Availability';
 
   return (
     <div className="flex flex-wrap items-center gap-2 overflow-x-auto rounded-2xl border border-slate-100 bg-white p-2 shadow-sm">
@@ -196,6 +208,22 @@ export function FilterBar({ value, onApply, types, amenities }: FilterBarProps) 
             </div>
           </div>
         )}
+      </FilterPopover>
+
+      {/* Availability (occupation expiry window) */}
+      <FilterPopover label={availLabel} active={draft.availabilityWithin != null}>
+        {close =>
+          AVAILABILITY_OPTIONS.map(o => (
+            <button
+              key={o.label}
+              type="button"
+              onClick={() => { set('availabilityWithin', o.value); close(); }}
+              className={`flex w-full px-4 py-2 text-sm hover:bg-slate-50 ${draft.availabilityWithin === o.value ? 'font-semibold text-blue-600' : 'text-slate-700'}`}
+            >
+              {o.label}
+            </button>
+          ))
+        }
       </FilterPopover>
 
       {/* Features (amenities) */}

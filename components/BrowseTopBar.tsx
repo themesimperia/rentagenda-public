@@ -5,7 +5,7 @@ import { X, LayoutGrid, List } from 'lucide-react';
 import { FilterPopover } from '@/components/ui/FilterPopover';
 import { type MarketplaceFilters, EMPTY_FILTERS, isFiltered } from '@/lib/filter';
 
-export type SortBy = 'relevant' | 'newest' | 'price_asc' | 'price_desc';
+export type SortBy = 'relevant' | 'newest' | 'price_asc' | 'price_desc' | 'available_soon';
 export type ViewMode = 'grid' | 'list';
 
 const BEDS_OPTIONS: { label: string; value: number | null }[] = [
@@ -21,6 +21,7 @@ const SORT_OPTIONS: { label: string; value: SortBy }[] = [
   { label: 'Newest', value: 'newest' },
   { label: 'Price: Low – High', value: 'price_asc' },
   { label: 'Price: High – Low', value: 'price_desc' },
+  { label: 'Available Soonest', value: 'available_soon' },
 ];
 
 

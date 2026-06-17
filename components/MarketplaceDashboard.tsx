@@ -15,9 +15,18 @@ import {
   deriveTypes,
   deriveAmenities,
 } from '@/lib/filter';
+import { availability } from '@/lib/format';
 import type { PublicListing } from '@/lib/types';
 
 const PAGE_SIZE = 9;
+
+/** Sort key: available now = 0, frees up in N days = N, occupied/unknown = last. */
+function availabilityRank(l: PublicListing): number {
+  const a = availability(l);
+  if (a.available) return 0;
+  if (a.freeDate != null) return a.daysLeft;
+  return Number.POSITIVE_INFINITY;
+}
 
 function sortListings(listings: PublicListing[], sortBy: SortBy): PublicListing[] {
   const arr = [...listings];
@@ -27,6 +36,8 @@ function sortListings(listings: PublicListing[], sortBy: SortBy): PublicListing[
     arr.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
   } else if (sortBy === 'price_desc') {
     arr.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
+  } else if (sortBy === 'available_soon') {
+    arr.sort((a, b) => availabilityRank(a) - availabilityRank(b));
   }
   return arr;
 }

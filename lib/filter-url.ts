@@ -16,6 +16,7 @@ export function filtersToParams(f: MarketplaceFilters): URLSearchParams {
   if (f.sizeMin != null) p.set('sizeMin', String(f.sizeMin));
   if (f.sizeMax != null) p.set('sizeMax', String(f.sizeMax));
   if (f.bedroomsMin != null) p.set('beds', String(f.bedroomsMin));
+  if (f.availabilityWithin != null) p.set('avail', String(f.availabilityWithin));
   return p;
 }
 
@@ -52,6 +53,7 @@ export function paramsToFilters(params: URLSearchParams): Partial<MarketplaceFil
   const sizeMin = num(params.get('sizeMin')); if (sizeMin != null) out.sizeMin = sizeMin;
   const sizeMax = num(params.get('sizeMax')); if (sizeMax != null) out.sizeMax = sizeMax;
   const beds = num(params.get('beds')); if (beds != null) out.bedroomsMin = beds;
+  const avail = num(params.get('avail')); if (avail != null) out.availabilityWithin = avail;
 
   return out;
 }

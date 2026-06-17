@@ -40,5 +40,9 @@ export function summarizeFilters(f: MarketplaceFilters): string {
     parts.push(`${lo}–${hi} m²`);
   }
 
+  if (f.availabilityWithin != null) {
+    parts.push(f.availabilityWithin === 0 ? 'Available now' : `≤${f.availabilityWithin} days`);
+  }
+
   return parts.length ? parts.join(' · ') : 'All properties';
 }

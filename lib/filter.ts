@@ -1,4 +1,5 @@
 import type { PublicListing, PropertyType, RentalTerm } from './types';
+import { availability } from './format';
 
 export interface MarketplaceFilters {
   search: string;
@@ -11,6 +12,8 @@ export interface MarketplaceFilters {
   sizeMin: number | null;
   sizeMax: number | null;
   bedroomsMin: number | null;
+  /** Available within N days (0 = available now); null = any. */
+  availabilityWithin: number | null;
 }
 
 export const EMPTY_FILTERS: MarketplaceFilters = {
@@ -24,6 +27,7 @@ export const EMPTY_FILTERS: MarketplaceFilters = {
   sizeMin: null,
   sizeMax: null,
   bedroomsMin: null,
+  availabilityWithin: null,
 };
 
 export function applyFilters(
@@ -45,6 +49,16 @@ export function applyFilters(
     if (f.sizeMax != null && (l.size_sqm == null || l.size_sqm > f.sizeMax)) return false;
     if (f.bedroomsMin != null && (l.bedrooms == null || l.bedrooms < f.bedroomsMin)) return false;
     if (f.amenities.length && !f.amenities.every(a => l.amenities.includes(a))) return false;
+    if (f.availabilityWithin != null) {
+      const a = availability(l);
+      if (f.availabilityWithin === 0) {
+        if (!a.available) return false; // available now only
+      } else {
+        // Available now, or frees up within the window (known date required).
+        const within = a.available || (a.freeDate != null && a.daysLeft <= f.availabilityWithin);
+        if (!within) return false;
+      }
+    }
     return true;
   });
 }
@@ -83,6 +97,7 @@ export function isFiltered(f: MarketplaceFilters): boolean {
     f.priceMax != null ||
     f.sizeMin != null ||
     f.sizeMax != null ||
-    f.bedroomsMin != null
+    f.bedroomsMin != null ||
+    f.availabilityWithin != null
   );
 }

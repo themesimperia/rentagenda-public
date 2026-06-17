@@ -1,6 +1,6 @@
 'use client';
 
-import { MapPin, DollarSign, Maximize2, Building2, Sparkles, CalendarClock, X } from 'lucide-react';
+import { MapPin, DollarSign, Maximize2, Building2, Sparkles, CalendarClock, CalendarCheck, X } from 'lucide-react';
 import { propertyTypeLabel, termLabel } from '@/lib/format';
 import { type MarketplaceFilters, EMPTY_FILTERS, isFiltered } from '@/lib/filter';
 import type { PropertyType, RentalTerm } from '@/lib/types';
@@ -16,6 +16,13 @@ const PRICE_PRESETS = [
 ];
 
 const RENTAL_TERMS: RentalTerm[] = ['long_term', 'short_term'];
+
+const AVAILABILITY_OPTIONS: { label: string; value: number | null }[] = [
+  { label: 'Available now', value: 0 },
+  { label: 'Within 30 days', value: 30 },
+  { label: 'Within 60 days', value: 60 },
+  { label: 'Within 90 days', value: 90 },
+];
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 function toggle<T>(arr: T[], value: T): T[] {
@@ -322,6 +329,29 @@ export function FilterSidebar({ filters, onChange, locations, types, amenities }
                 className="h-4 w-4 rounded border-slate-300 text-blue-600 accent-blue-600 focus:ring-blue-500"
               />
               {termLabel(term)}
+            </label>
+          ))}
+        </div>
+      </Section>
+
+      {/* Availability */}
+      <Section
+        icon={CalendarCheck}
+        title="Availability"
+        active={filters.availabilityWithin != null}
+        onClear={() => set('availabilityWithin', null)}
+      >
+        <div className="space-y-2.5">
+          {AVAILABILITY_OPTIONS.map(opt => (
+            <label key={opt.label} className="flex cursor-pointer items-center gap-2.5 text-sm text-slate-600">
+              <input
+                type="radio"
+                name="availability"
+                checked={filters.availabilityWithin === opt.value}
+                onChange={() => set('availabilityWithin', opt.value)}
+                className="h-4 w-4 border-slate-300 text-blue-600 accent-blue-600 focus:ring-blue-500"
+              />
+              {opt.label}
             </label>
           ))}
         </div>
