@@ -34,41 +34,51 @@ export function BrowseTopBar({
     });
   }
 
+  const hasChipsRow = filters.locations.length > 0 || isFiltered(filters);
+
   return (
     <div className="space-y-3">
-      {/* ── Top row ─────────────────────────────────────────────── */}
-      <div className="flex flex-wrap items-center gap-2">
-        {/* Active location chips */}
-        {filters.locations.map(loc => (
-          <span
-            key={loc}
-            className="flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700"
-          >
-            {loc}
+      {/* ── Active location chips + clear all ───────────────────── */}
+      {hasChipsRow && (
+        <div className="flex flex-wrap items-center gap-2">
+          {filters.locations.map(loc => (
+            <span
+              key={loc}
+              className="flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700"
+            >
+              {loc}
+              <button
+                type="button"
+                onClick={() => removeLocation(loc)}
+                aria-label={`Remove ${loc}`}
+                className="ml-0.5 rounded-full text-blue-400 hover:text-blue-700"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </span>
+          ))}
+          {isFiltered(filters) && (
             <button
               type="button"
-              onClick={() => removeLocation(loc)}
-              aria-label={`Remove ${loc}`}
-              className="ml-0.5 rounded-full text-blue-400 hover:text-blue-700"
+              onClick={() => onFiltersChange(EMPTY_FILTERS)}
+              className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:border-slate-300 hover:bg-slate-50"
             >
-              <X className="h-3.5 w-3.5" />
+              Clear all filters
+              <X className="h-4 w-4" />
             </button>
-          </span>
-        ))}
+          )}
+        </div>
+      )}
 
-        {/* Clear all — only shown when filters are active */}
-        {isFiltered(filters) && (
-          <button
-            type="button"
-            onClick={() => onFiltersChange(EMPTY_FILTERS)}
-            className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:border-slate-300 hover:bg-slate-50"
-          >
-            Clear all filters
-            <X className="h-4 w-4" />
-          </button>
+      {/* ── Results count (left) + view controls (right) ────────── */}
+      <div className="flex flex-wrap items-center gap-2">
+        {!loading && (
+          <div className="text-sm text-slate-500">
+            <strong className="text-slate-800">{resultCount}</strong>{' '}
+            {resultCount === 1 ? 'property' : 'properties'} found
+          </div>
         )}
 
-        {/* Spacer */}
         <div className="flex-1" />
 
         {/* Column count (grid view only) */}
@@ -114,14 +124,6 @@ export function BrowseTopBar({
           </button>
         </div>
       </div>
-
-      {/* ── Results count ───────────────────────────────────────── */}
-      {!loading && (
-        <div className="text-sm text-slate-500">
-          <strong className="text-slate-800">{resultCount}</strong>{' '}
-          {resultCount === 1 ? 'property' : 'properties'} found
-        </div>
-      )}
     </div>
   );
 }
