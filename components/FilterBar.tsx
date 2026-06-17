@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Search, Bookmark } from 'lucide-react';
+import { useEffect, useRef, useMemo, useState } from 'react';
+import { Search, Bookmark, MapPin, X } from 'lucide-react';
 import { FilterPopover } from '@/components/ui/FilterPopover';
 import { propertyTypeLabel, termLabel } from '@/lib/format';
 import { summarizeFilters } from '@/lib/saved-searches';
@@ -42,6 +42,20 @@ function toggle<T>(arr: T[], v: T): T[] {
   return arr.includes(v) ? arr.filter(x => x !== v) : [...arr, v];
 }
 
+/** Wraps the matching substring in a blue bold span. */
+function HighlightMatch({ text, query }: { text: string; query: string }) {
+  if (!query.trim()) return <>{text}</>;
+  const idx = text.toLowerCase().indexOf(query.trim().toLowerCase());
+  if (idx === -1) return <>{text}</>;
+  return (
+    <>
+      {text.slice(0, idx)}
+      <span className="font-bold text-blue-600">{text.slice(idx, idx + query.trim().length)}</span>
+      {text.slice(idx + query.trim().length)}
+    </>
+  );
+}
+
 interface FilterBarProps {
   value: MarketplaceFilters;
   onApply: (f: MarketplaceFilters) => void;
@@ -49,15 +63,66 @@ interface FilterBarProps {
   amenities: string[];
   sortBy: SortBy;
   onSortChange: (s: SortBy) => void;
+  locations?: string[];
 }
 
-export function FilterBar({ value, onApply, types, amenities, sortBy, onSortChange }: FilterBarProps) {
+export function FilterBar({ value, onApply, types, amenities, sortBy, onSortChange, locations = [] }: FilterBarProps) {
   const [draft, setDraft] = useState<MarketplaceFilters>(value);
-  // Re-seed the draft whenever the committed filters change so the bar reflects
-  // live sidebar edits. Trade-off: editing the sidebar mid-edit discards any
-  // un-applied bar changes (the live sidebar is the source of truth).
-  useEffect(() => { setDraft(value); }, [value]);
 
+  // When the committed filters change (e.g. sidebar edit or Clear all), re-seed
+  // the draft — but skip the re-seed when we triggered the change ourselves via
+  // the real-time search (otherwise draft price/beds etc. would be wiped).
+  const skipReseedRef = useRef(false);
+  useEffect(() => {
+    if (skipReseedRef.current) { skipReseedRef.current = false; return; }
+    setDraft(value);
+    setSearchText(value.search);
+  }, [value]);
+
+  // ── Real-time search state (separate from draft) ─────────────────────────
+  const [searchText, setSearchText] = useState(value.search);
+  const [suggestionsOpen, setSuggestionsOpen] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setSuggestionsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const suggestions = useMemo(() => {
+    const q = searchText.trim().toLowerCase();
+    if (!q) return [];
+    return locations.filter(loc => loc.toLowerCase().includes(q)).slice(0, 8);
+  }, [searchText, locations]);
+
+  function handleSearchChange(text: string) {
+    setSearchText(text);
+    setSuggestionsOpen(true);
+    // Apply immediately without going through the draft cycle.
+    skipReseedRef.current = true;
+    onApply({ ...value, search: text });
+  }
+
+  function clearSearch() {
+    setSearchText('');
+    setSuggestionsOpen(false);
+    skipReseedRef.current = true;
+    onApply({ ...value, search: '' });
+  }
+
+  function selectSuggestion(loc: string) {
+    setSearchText(loc);
+    setSuggestionsOpen(false);
+    skipReseedRef.current = true;
+    onApply({ ...value, search: loc });
+  }
+
+  // ── Save search ───────────────────────────────────────────────────────────
   const { user } = useAuth();
   const { openAuth } = useAuthModal();
   const [name, setName] = useState('');
@@ -68,9 +133,9 @@ export function FilterBar({ value, onApply, types, amenities, sortBy, onSortChan
     if (!user) { openAuth('signin'); close(); return; }
     setSaving(true);
     try {
-      // Apply the draft too, so the saved search matches the visible results.
-      onApply(draft);
-      await saveSearch(user.uid, name.trim() || summarizeFilters(draft), draft);
+      const current = { ...draft, search: searchText };
+      onApply(current);
+      await saveSearch(user.uid, name.trim() || summarizeFilters(current), current);
       setSaved(true);
       setName('');
       setTimeout(() => { setSaved(false); close(); }, 900);
@@ -83,9 +148,6 @@ export function FilterBar({ value, onApply, types, amenities, sortBy, onSortChan
     setDraft(d => ({ ...d, [key]: v }));
   }
 
-  // Labels stay fixed (the filter's name) so selecting a value never widens a
-  // button and pushes the row to wrap. Selection is shown via the active
-  // highlight + count badges instead.
   const termValue: RentalTerm | 'all' = draft.terms.length === 1 ? draft.terms[0] : 'all';
   const priceActive = draft.priceMin != null || draft.priceMax != null;
   const sizeCount = (draft.sizeMin != null ? 1 : 0) + (draft.sizeMax != null ? 1 : 0);
@@ -117,16 +179,52 @@ export function FilterBar({ value, onApply, types, amenities, sortBy, onSortChan
         )}
       </FilterPopover>
 
-      {/* Search by location */}
-      <div className="relative min-w-[180px] flex-1">
+      {/* ── Search with autocomplete ──────────────────────────────────── */}
+      <div className="relative min-w-[200px] flex-1" ref={searchRef}>
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
         <input
-          value={draft.search}
-          onChange={e => set('search', e.target.value)}
-          placeholder="Search by location"
+          value={searchText}
+          onChange={e => handleSearchChange(e.target.value)}
+          onFocus={() => { if (searchText) setSuggestionsOpen(true); }}
+          placeholder="Search by location…"
           aria-label="Search by location"
-          className="w-full rounded-full border border-slate-200 bg-white py-2 pl-9 pr-4 text-sm text-slate-700 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none"
+          aria-autocomplete="list"
+          aria-expanded={suggestionsOpen && suggestions.length > 0}
+          className="w-full rounded-full border border-slate-200 bg-white py-2 pl-9 pr-8 text-sm text-slate-700 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none"
         />
+        {searchText && (
+          <button
+            type="button"
+            onClick={clearSearch}
+            aria-label="Clear search"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        )}
+
+        {/* Suggestions dropdown */}
+        {suggestionsOpen && suggestions.length > 0 && (
+          <ul
+            role="listbox"
+            className="absolute left-0 top-full z-50 mt-1.5 w-full overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-xl"
+          >
+            {suggestions.map(loc => (
+              <li key={loc} role="option" aria-selected={false}>
+                <button
+                  type="button"
+                  // mousedown fires before blur, so the suggestion is selected before
+                  // the input loses focus and closes the dropdown.
+                  onMouseDown={e => { e.preventDefault(); selectSuggestion(loc); }}
+                  className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm text-slate-700 hover:bg-blue-50"
+                >
+                  <MapPin className="h-3.5 w-3.5 shrink-0 text-blue-500" />
+                  <HighlightMatch text={loc} query={searchText} />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       {/* Beds */}
@@ -202,7 +300,7 @@ export function FilterBar({ value, onApply, types, amenities, sortBy, onSortChan
         )}
       </FilterPopover>
 
-      {/* Availability — occupancy window filter + soonest-available sort */}
+      {/* Availability */}
       <FilterPopover
         label="Availability"
         active={draft.availabilityWithin != null || sortBy === 'available_soon'}
@@ -215,10 +313,9 @@ export function FilterBar({ value, onApply, types, amenities, sortBy, onSortChan
                 key={o.label}
                 type="button"
                 onClick={() => {
-                  // Apply immediately so the single-select takes effect without "Apply".
                   const next = { ...draft, availabilityWithin: o.value };
                   setDraft(next);
-                  onApply(next);
+                  onApply({ ...next, search: searchText });
                   close();
                 }}
                 className={`flex w-full items-center justify-between px-4 py-2 text-sm hover:bg-slate-50 ${draft.availabilityWithin === o.value ? 'font-semibold text-blue-600' : 'text-slate-700'}`}
@@ -295,10 +392,10 @@ export function FilterBar({ value, onApply, types, amenities, sortBy, onSortChan
         )}
       </FilterPopover>
 
-      {/* Apply */}
+      {/* Apply — merges draft + current search text */}
       <button
         type="button"
-        onClick={() => onApply(draft)}
+        onClick={() => onApply({ ...draft, search: searchText })}
         className="rounded-full bg-blue-600 px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
       >
         Apply
@@ -320,7 +417,7 @@ export function FilterBar({ value, onApply, types, amenities, sortBy, onSortChan
               <p className="px-1 py-2 text-sm font-medium text-emerald-600">Saved ✓</p>
             ) : (
               <>
-                <p className="mb-2 text-xs text-slate-500">{summarizeFilters(draft)}</p>
+                <p className="mb-2 text-xs text-slate-500">{summarizeFilters({ ...draft, search: searchText })}</p>
                 <input
                   value={name}
                   onChange={e => setName(e.target.value)}

@@ -130,6 +130,7 @@ export function MarketplaceDashboard({
                   onApply={setFilters}
                   types={types}
                   amenities={amenities}
+                  locations={locations}
                   sortBy={sortBy}
                   onSortChange={setSortBy}
                 />
