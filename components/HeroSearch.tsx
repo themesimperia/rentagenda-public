@@ -21,8 +21,7 @@ const TYPE_OPTIONS = [
   { value: 'vacation', label: 'Vacation rental' },
 ];
 
-const PRICE_PRESETS = [0, 300, 500, 800, 1000, 1500, 2000, 3000];
-const PRICE_MAX_SLIDER = 3000;
+const PRICE_PRESETS = [500, 800, 1000, 1500, 2000, 3000];
 
 function useClickOutside(ref: React.RefObject<HTMLElement | null>, onClose: () => void) {
   useEffect(() => {
@@ -182,27 +181,23 @@ export function HeroSearch({ regions }: { regions: string[] }) {
 
           {priceOpen && (
             <div className="absolute left-0 top-full z-50 mt-2 w-80 rounded-2xl border border-slate-100 bg-white p-5 shadow-xl">
-              {/* Min / Max inputs */}
+              {/* Min / Max number inputs */}
               <div className="mb-4 grid grid-cols-2 gap-4">
                 <div>
                   <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
                     Minimum
                   </p>
-                  <div className="rounded-xl border border-slate-200 px-3 py-2.5">
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="range"
-                        min={0}
-                        max={PRICE_MAX_SLIDER}
-                        step={100}
-                        value={priceMin ?? 0}
-                        onChange={e => setPriceMin(Number(e.target.value) || null)}
-                        className="h-1.5 w-full cursor-pointer accent-blue-600"
-                      />
-                    </div>
-                    <p className="mt-1 text-xs font-medium text-slate-700">
-                      {priceMin != null ? `$${priceMin.toLocaleString()}` : '$0'}
-                    </p>
+                  <div className="flex items-center rounded-xl border border-slate-200 px-3 py-2.5 focus-within:border-blue-500">
+                    <span className="mr-1 text-sm text-slate-400">$</span>
+                    <input
+                      type="number"
+                      min={0}
+                      step={50}
+                      placeholder="0"
+                      value={priceMin ?? ''}
+                      onChange={e => setPriceMin(e.target.value ? Number(e.target.value) : null)}
+                      className="w-full bg-transparent text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none"
+                    />
                   </div>
                 </div>
 
@@ -210,44 +205,65 @@ export function HeroSearch({ regions }: { regions: string[] }) {
                   <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
                     Maximum
                   </p>
-                  <input
-                    type="number"
-                    min={0}
-                    placeholder="0"
-                    value={priceMax ?? ''}
-                    onChange={e => setPriceMax(e.target.value ? Number(e.target.value) : null)}
-                    className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none"
-                  />
+                  <div className="flex items-center rounded-xl border border-slate-200 px-3 py-2.5 focus-within:border-blue-500">
+                    <span className="mr-1 text-sm text-slate-400">$</span>
+                    <input
+                      type="number"
+                      min={0}
+                      step={50}
+                      placeholder="Any"
+                      value={priceMax ?? ''}
+                      onChange={e => setPriceMax(e.target.value ? Number(e.target.value) : null)}
+                      className="w-full bg-transparent text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none"
+                    />
+                  </div>
                 </div>
               </div>
 
+              {/* Validation hint when min > max */}
+              {priceMin != null && priceMax != null && priceMin > priceMax && (
+                <p className="mb-3 text-xs font-medium text-red-500">
+                  Minimum can’t be greater than maximum.
+                </p>
+              )}
+
               <div className="mb-3 border-t border-dashed border-slate-200" />
 
-              {/* Preset prices */}
-              <div className="grid grid-cols-2 gap-1">
+              {/* Quick presets */}
+              <div className="mb-4 grid grid-cols-2 gap-1">
                 {PRICE_PRESETS.map(p => (
                   <button
                     key={p}
                     type="button"
-                    onClick={() => setPriceMin(p === 0 ? null : p)}
+                    onClick={() => setPriceMax(p)}
                     className={`rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-blue-50 hover:text-blue-700 ${
-                      (priceMin ?? 0) === p ? 'bg-blue-50 font-semibold text-blue-600' : 'text-slate-700'
+                      priceMax === p ? 'bg-blue-50 font-semibold text-blue-600' : 'text-slate-700'
                     }`}
                   >
-                    {p === 0 ? '$0' : `$${p.toLocaleString()}`}
+                    Up to ${p.toLocaleString()}
                   </button>
                 ))}
               </div>
 
-              {hasPrice && (
+              {/* Apply + Clear */}
+              <div className="flex items-center gap-2">
+                {hasPrice && (
+                  <button
+                    type="button"
+                    onClick={() => { setPriceMin(null); setPriceMax(null); }}
+                    className="rounded-xl px-3 py-2.5 text-sm font-medium text-slate-500 transition-colors hover:text-red-500"
+                  >
+                    Clear
+                  </button>
+                )}
                 <button
                   type="button"
-                  onClick={() => { setPriceMin(null); setPriceMax(null); }}
-                  className="mt-3 w-full rounded-lg py-1.5 text-xs font-medium text-slate-400 hover:text-red-500 transition-colors"
+                  onClick={() => setPriceOpen(false)}
+                  className="flex-1 rounded-xl bg-blue-600 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
                 >
-                  Clear price range
+                  Apply
                 </button>
-              )}
+              </div>
             </div>
           )}
         </div>
