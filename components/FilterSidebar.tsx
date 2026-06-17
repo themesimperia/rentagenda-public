@@ -1,6 +1,6 @@
 'use client';
 
-import { MapPin, DollarSign, Maximize2, Building2, Sparkles, CalendarClock, CalendarCheck, X } from 'lucide-react';
+import { MapPin, DollarSign, Maximize2, Building2, Sparkles, CalendarClock, CalendarCheck, X, PanelLeftClose } from 'lucide-react';
 import { propertyTypeLabel, termLabel } from '@/lib/format';
 import { type MarketplaceFilters, EMPTY_FILTERS, isFiltered } from '@/lib/filter';
 import type { PropertyType, RentalTerm } from '@/lib/types';
@@ -155,9 +155,11 @@ interface FilterSidebarProps {
   amenities: string[];
   /** When true, omits the outer card wrapper and header — for use inside a drawer. */
   bare?: boolean;
+  /** Called when the user clicks the collapse button. Shows the button when provided. */
+  onCollapse?: () => void;
 }
 
-export function FilterSidebar({ filters, onChange, locations, types, amenities, bare = false }: FilterSidebarProps) {
+export function FilterSidebar({ filters, onChange, locations, types, amenities, bare = false, onCollapse }: FilterSidebarProps) {
   function set<K extends keyof MarketplaceFilters>(key: K, value: MarketplaceFilters[K]) {
     onChange({ ...filters, [key]: value });
   }
@@ -383,7 +385,19 @@ export function FilterSidebar({ filters, onChange, locations, types, amenities, 
     <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-4">
-        <h2 className="text-base font-bold text-slate-900">Custom Filter</h2>
+        <div className="flex items-center gap-2">
+          {onCollapse && (
+            <button
+              type="button"
+              onClick={onCollapse}
+              aria-label="Collapse sidebar"
+              className="grid h-6 w-6 place-items-center rounded text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+            >
+              <PanelLeftClose className="h-4 w-4" />
+            </button>
+          )}
+          <h2 className="text-base font-bold text-slate-900">Custom Filter</h2>
+        </div>
         {isFiltered(filters) && (
           <button
             type="button"
