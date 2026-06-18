@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Check, ArrowRight, LayoutDashboard } from 'lucide-react';
-import { PLANS, planLabel, type BillingCycle } from '@/lib/plans';
+import { planLabel, PLAN_ICONS, type Plan, type BillingCycle } from '@/lib/plans';
+import { usePlans } from '@/lib/use-plans';
 import { OWNER_SUBSCRIBE_URL } from '@/lib/config';
 import { useOwnerStatus } from '@/lib/use-owner-status';
 import { useAuth } from '@/lib/auth-context';
@@ -11,14 +12,20 @@ import { useAuthModal } from '@/lib/auth-modal-context';
 
 export function PricingPlans() {
   const [cycle, setCycle] = useState<BillingCycle>('monthly');
+  const plans = usePlans();
   const { user } = useAuth();
   const { openAuth } = useAuthModal();
   const { plan: currentPlan, isPaidOwner } = useOwnerStatus();
 
-  function priceText(plan: typeof PLANS[number]): { big: string; sub: string } {
+  function priceText(plan: Plan): { big: string; sub: string } {
     if (plan.monthly === 0) return { big: '$0', sub: 'forever' };
     if (cycle === 'monthly') return { big: `$${plan.monthly}`, sub: '/month' };
     return { big: `$${plan.annual}`, sub: '/year' };
+  }
+
+  /** App 1 Subscriptions deep-link with the chosen plan + billing cycle. */
+  function subscribeUrl(planId: string): string {
+    return `${OWNER_SUBSCRIBE_URL}?plan=${encodeURIComponent(planId)}&cycle=${cycle}`;
   }
 
   function ctaFor(planId: string, isCurrent: boolean) {
@@ -49,10 +56,10 @@ export function PricingPlans() {
         </button>
       );
     }
-    // Signed in → send to App 1 Subscriptions to pick + pay.
+    // Signed in → deep-link to App 1 Subscriptions with this plan + cycle.
     return (
       <a
-        href={OWNER_SUBSCRIBE_URL}
+        href={subscribeUrl(planId)}
         target="_blank"
         rel="noopener noreferrer"
         className={`flex w-full items-center justify-center gap-1.5 rounded-xl py-3 text-sm font-semibold transition-colors ${
@@ -128,8 +135,8 @@ export function PricingPlans() {
 
       {/* Plan cards */}
       <div className="mt-10 grid gap-6 md:grid-cols-3">
-        {PLANS.map(plan => {
-          const Icon = plan.icon;
+        {plans.map(plan => {
+          const Icon = PLAN_ICONS[plan.icon];
           const isCurrent = currentPlan === plan.id;
           const { big, sub } = priceText(plan);
           return (

@@ -3,11 +3,14 @@ import { Zap, Crown, Building2 } from 'lucide-react';
 
 export type PlanId = 'free' | 'owner' | 'agency';
 export type BillingCycle = 'monthly' | 'annual';
+export type PlanIconKey = 'zap' | 'crown' | 'building2';
 
+/** Serializable plan shape — matches the Firestore `public_config/subscription_plans` doc. */
 export interface Plan {
   id: PlanId;
   name: string;
-  icon: LucideIcon;
+  /** Icon stored as a string key (Firestore can't hold components). */
+  icon: PlanIconKey;
   /** Price in whole dollars. */
   monthly: number;
   /** Annual total (2 months free vs monthly × 12). */
@@ -18,13 +21,21 @@ export interface Plan {
   popular?: boolean;
 }
 
-// Mirrors App 1 (src/pages/Subscriptions.jsx). Monthly prices match App 1;
-// annual = monthly × 10 (two months free).
-export const PLANS: Plan[] = [
+/** Maps the stored icon key to a Lucide component. */
+export const PLAN_ICONS: Record<PlanIconKey, LucideIcon> = {
+  zap: Zap,
+  crown: Crown,
+  building2: Building2,
+};
+
+// Fallback plans — mirror App 1 (src/pages/Subscriptions.jsx). Used when the
+// shared Firestore config doc is absent. Monthly prices match App 1; annual =
+// monthly × 10 (two months free).
+export const FALLBACK_PLANS: Plan[] = [
   {
     id: 'free',
     name: 'Free',
-    icon: Zap,
+    icon: 'zap',
     monthly: 0,
     annual: 0,
     description: 'Perfect for getting started',
@@ -43,7 +54,7 @@ export const PLANS: Plan[] = [
   {
     id: 'owner',
     name: 'Owner',
-    icon: Crown,
+    icon: 'crown',
     monthly: 29,
     annual: 290,
     description: 'Full access for property owners',
@@ -61,7 +72,7 @@ export const PLANS: Plan[] = [
   {
     id: 'agency',
     name: 'Agency',
-    icon: Building2,
+    icon: 'building2',
     monthly: 99,
     annual: 990,
     description: 'For property management agencies',
@@ -83,5 +94,5 @@ export function isPaidPlan(plan: PlanId | null | undefined): boolean {
 }
 
 export function planLabel(plan: PlanId | null | undefined): string {
-  return PLANS.find(p => p.id === plan)?.name ?? 'Free';
+  return FALLBACK_PLANS.find(p => p.id === plan)?.name ?? 'Free';
 }
