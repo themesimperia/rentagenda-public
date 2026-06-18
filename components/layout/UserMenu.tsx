@@ -2,12 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ChevronDown, LogOut, LayoutDashboard, Building2, Bookmark } from 'lucide-react';
+import { ChevronDown, LogOut, Bookmark } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
-import { useOwnerStatus } from '@/lib/use-owner-status';
-import { OWNER_APP_URL } from '@/lib/config';
-
-const AGENDARENT_URL = OWNER_APP_URL;
 
 function initials(nameOrEmail: string): string {
   const base = nameOrEmail.includes('@') ? nameOrEmail.split('@')[0] : nameOrEmail;
@@ -16,7 +12,6 @@ function initials(nameOrEmail: string): string {
 
 export function UserMenu() {
   const { user, signOutUser } = useAuth();
-  const { isPaidOwner } = useOwnerStatus();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -70,29 +65,6 @@ export function UserMenu() {
             <Bookmark className="h-4 w-4 text-slate-400" />
             My dashboard
           </Link>
-
-          {isPaidOwner ? (
-            // Paid owners get direct access to the management app.
-            <a
-              href={AGENDARENT_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50"
-            >
-              <LayoutDashboard className="h-4 w-4 text-slate-400" />
-              Go to AgendaRent
-            </a>
-          ) : (
-            // Everyone else is routed to the pricing page first.
-            <Link
-              href="/list-your-property"
-              onClick={() => setOpen(false)}
-              className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50"
-            >
-              <Building2 className="h-4 w-4 text-slate-400" />
-              List your property
-            </Link>
-          )}
 
           <div className="my-1 border-t border-slate-100" />
           <button
