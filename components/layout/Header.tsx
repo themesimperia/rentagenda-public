@@ -171,6 +171,14 @@ export function Header() {
 
           {/* Auth area + icons */}
           <div className="flex shrink-0 items-center gap-1">
+            {/* List-your-property CTA — visible entry point to the pricing page */}
+            <Link
+              href="/list-your-property"
+              className="mr-1 hidden items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3.5 py-1.5 text-sm font-semibold text-blue-700 transition-colors hover:bg-blue-100 sm:flex"
+            >
+              <Building2 className="h-4 w-4" />
+              List your property
+            </Link>
             {user && <HeaderNotifications />}
             {loading ? (
               <div className="h-8 w-20 animate-pulse rounded-full bg-slate-100" />
