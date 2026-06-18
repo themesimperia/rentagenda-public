@@ -2,3 +2,6 @@
  * NEXT_PUBLIC_OWNER_APP_URL; falls back to production. */
 export const OWNER_APP_URL =
   process.env.NEXT_PUBLIC_OWNER_APP_URL ?? 'https://rent-agenda.vercel.app';
+
+/** App 1 subscription/upgrade screen — where marketplace plan CTAs send users. */
+export const OWNER_SUBSCRIBE_URL = `${OWNER_APP_URL}/Subscriptions`;
