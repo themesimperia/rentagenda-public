@@ -5,3 +5,7 @@ export const OWNER_APP_URL =
 
 /** App 1 subscription/upgrade screen — where marketplace plan CTAs send users. */
 export const OWNER_SUBSCRIBE_URL = `${OWNER_APP_URL}/Subscriptions`;
+
+/** App 1 public landing page — where a renter goes to create an owner account
+ * and list a property. Payment/plans are handled entirely in App 1. */
+export const OWNER_LANDING_URL = `${OWNER_APP_URL}/Landing`;

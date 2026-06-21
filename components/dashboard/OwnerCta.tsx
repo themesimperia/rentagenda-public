@@ -1,10 +1,9 @@
 'use client';
 
-import Link from 'next/link';
 import { Building2, LayoutDashboard, ArrowRight } from 'lucide-react';
 import { useOwnerStatus } from '@/lib/use-owner-status';
 import { planLabel } from '@/lib/plans';
-import { OWNER_APP_URL } from '@/lib/config';
+import { OWNER_APP_URL, OWNER_LANDING_URL } from '@/lib/config';
 
 /** Profile card: routes non-owners to pricing, paid owners to AgendaRent. */
 export function OwnerCta() {
@@ -52,13 +51,15 @@ export function OwnerCta() {
           <p className="text-xs text-slate-500">List it on RentAgenda and reach renters directly.</p>
         </div>
       </div>
-      <Link
-        href="/list-your-property"
+      <a
+        href={OWNER_LANDING_URL}
+        target="_blank"
+        rel="noopener noreferrer"
         className="flex shrink-0 items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
       >
         List your property
         <ArrowRight className="h-4 w-4" />
-      </Link>
+      </a>
     </div>
   );
 }

@@ -1,16 +1,8 @@
-import type { Metadata } from 'next';
-import { PricingPlans } from '@/components/PricingPlans';
+import { redirect } from 'next/navigation';
+import { OWNER_LANDING_URL } from '@/lib/config';
 
-export const metadata: Metadata = {
-  title: 'List your property',
-  description:
-    'Choose a plan to list your property on RentAgenda and manage everything from one dashboard. Reach renters directly with no agent fees.',
-};
-
+// The marketplace no longer hosts pricing/checkout. Listing a property and
+// paying are handled entirely in App 1 — send anyone here to its landing page.
 export default function ListYourPropertyPage() {
-  return (
-    <div className="min-h-screen bg-slate-50">
-      <PricingPlans />
-    </div>
-  );
+  redirect(OWNER_LANDING_URL);
 }

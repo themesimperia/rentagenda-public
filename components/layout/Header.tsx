@@ -9,7 +9,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useAuthModal } from '@/lib/auth-modal-context';
 import { useOwnerStatus } from '@/lib/use-owner-status';
 import { useSearchSuggestions } from '@/lib/use-search-suggestions';
-import { OWNER_APP_URL } from '@/lib/config';
+import { OWNER_APP_URL, OWNER_LANDING_URL } from '@/lib/config';
 import { UserMenu } from '@/components/layout/UserMenu';
 import { HeaderNotifications } from '@/components/layout/HeaderNotifications';
 
@@ -174,8 +174,9 @@ export function Header() {
 
           {/* Auth area + icons */}
           <div className="flex shrink-0 items-center gap-1">
-            {/* Single owner entry point. Paid owners → AgendaRent; everyone
-                else → pricing page. (This is the only such link in the header.) */}
+            {/* Single owner entry point. Paid owners → AgendaRent dashboard;
+                everyone else → App 1 landing to create an account & list.
+                Payment/plans are handled entirely in App 1. */}
             {isPaidOwner ? (
               <a
                 href={OWNER_APP_URL}
@@ -187,13 +188,15 @@ export function Header() {
                 Go to AgendaRent
               </a>
             ) : (
-              <Link
-                href="/list-your-property"
+              <a
+                href={OWNER_LANDING_URL}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="mr-1 hidden items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3.5 py-1.5 text-sm font-semibold text-blue-700 transition-colors hover:bg-blue-100 sm:flex"
               >
                 <Building2 className="h-4 w-4" />
                 List your property
-              </Link>
+              </a>
             )}
             {user && <HeaderNotifications />}
             {loading ? (
