@@ -7,5 +7,7 @@ export const OWNER_APP_URL =
 export const OWNER_SUBSCRIBE_URL = `${OWNER_APP_URL}/Subscriptions`;
 
 /** App 1 public landing page — where a renter goes to create an owner account
- * and list a property. Payment/plans are handled entirely in App 1. */
-export const OWNER_LANDING_URL = `${OWNER_APP_URL}/Landing`;
+ * and list a property. Payment/plans are handled entirely in App 1. The
+ * `ref=marketplace` flag tells App 1 to show the landing page instead of
+ * auto-redirecting an already-logged-in user to their dashboard. */
+export const OWNER_LANDING_URL = `${OWNER_APP_URL}/Landing?ref=marketplace`;
