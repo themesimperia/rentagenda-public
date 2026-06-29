@@ -1,6 +1,15 @@
 export type PropertyType = 'apartment' | 'house' | 'villa' | 'office' | 'vacation';
 export type RentalTerm = 'long_term' | 'short_term';
 
+export type ContactType =
+  | 'phone' | 'instagram' | 'facebook' | 'linkedin' | 'x' | 'telegram' | 'website';
+
+export interface ListingContact {
+  type: ContactType;
+  value: string;
+  href: string;
+}
+
 export interface PublicListing {
   id: string;
   apartment_id: string;
@@ -21,6 +30,8 @@ export interface PublicListing {
   photos: string[];
   owner_name?: string | null;
   owner_avatar?: string | null;
+  contacts?: ListingContact[];
+  owner_name_public?: boolean;
   /** Explicit occupancy of the unit (derived from the apartment's status). */
   availability_status?: 'available' | 'occupied';
   /** ISO date (YYYY-MM-DD) the unit frees up; null/absent = unknown. */
