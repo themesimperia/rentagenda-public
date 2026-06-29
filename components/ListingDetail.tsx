@@ -11,6 +11,7 @@ import { PhotoGallery } from '@/components/PhotoGallery';
 import { InquiryForm } from '@/components/InquiryForm';
 import { PropertyMap } from '@/components/PropertyMap';
 import { SaveButton } from '@/components/SaveButton';
+import { ContactLinks } from '@/components/ContactLinks';
 import { propertyTypeLabel, termLabel, formatPrice, availability, maskName } from '@/lib/format';
 import type { PublicListing } from '@/lib/types';
 
@@ -35,7 +36,9 @@ export function ListingDetail({ listing }: { listing: PublicListing }) {
   const [intent, setIntent] = useState<'message' | 'viewing'>('message');
   const avail = availability(listing);
   const ownerName = listing.owner_name?.trim();
-  const ownerMasked = ownerName ? maskName(ownerName) : '';
+  const ownerDisplay = ownerName
+    ? (listing.owner_name_public ? ownerName : maskName(ownerName))
+    : '';
 
   return (
     <div className="min-h-screen bg-white">
@@ -208,25 +211,28 @@ export function ListingDetail({ listing }: { listing: PublicListing }) {
               </div>
 
               {/* Owner */}
-              <div className="mb-5 flex items-center gap-3 rounded-lg border border-slate-100 bg-slate-50 px-3 py-2.5">
-                {listing.owner_avatar ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={listing.owner_avatar}
-                    alt={ownerMasked || 'Owner'}
-                    className="h-9 w-9 rounded-full object-cover"
-                  />
-                ) : (
-                  <span className="grid h-9 w-9 place-items-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700">
-                    {ownerName ? initials(ownerName) : 'PO'}
-                  </span>
-                )}
-                <div className="min-w-0">
-                  <p className="text-xs text-slate-400">Listed by</p>
-                  <p className="truncate text-sm font-semibold text-slate-700">
-                    {ownerMasked || 'Property owner'}
-                  </p>
+              <div className="mb-5 rounded-lg border border-slate-100 bg-slate-50 px-3 py-2.5">
+                <div className="flex items-center gap-3">
+                  {listing.owner_avatar ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={listing.owner_avatar}
+                      alt={ownerDisplay || 'Owner'}
+                      className="h-9 w-9 rounded-full object-cover"
+                    />
+                  ) : (
+                    <span className="grid h-9 w-9 place-items-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700">
+                      {ownerName ? initials(ownerName) : 'PO'}
+                    </span>
+                  )}
+                  <div className="min-w-0">
+                    <p className="text-xs text-slate-400">Listed by</p>
+                    <p className="truncate text-sm font-semibold text-slate-700">
+                      {ownerDisplay || 'Property owner'}
+                    </p>
+                  </div>
                 </div>
+                <ContactLinks contacts={listing.contacts ?? []} />
               </div>
 
               {/* CTA */}
