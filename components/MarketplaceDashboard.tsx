@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { SearchX, PanelLeftOpen } from 'lucide-react';
 import { FilterSidebar } from '@/components/FilterSidebar';
 import { FilterBar } from '@/components/FilterBar';
@@ -19,6 +20,14 @@ import { availability } from '@/lib/format';
 import type { PublicListing } from '@/lib/types';
 
 const PAGE_SIZE = 9;
+
+// Leaflet touches `window`, so load the map only on the client.
+const ListingsMap = dynamic(() => import('@/components/ListingsMap'), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[70vh] animate-pulse rounded-2xl border border-slate-200 bg-slate-100" />
+  ),
+});
 
 function availabilityRank(l: PublicListing): number {
   const a = availability(l);
@@ -163,6 +172,27 @@ export function MarketplaceDashboard({
                     Clear all filters
                   </button>
                 </div>
+              ) : view === 'map' ? (
+                <div className="space-y-2">
+                  <div className="h-[70vh] overflow-hidden rounded-2xl border border-slate-200">
+                    <ListingsMap
+                      listings={filtered}
+                      selectedId={selectedId}
+                      onSelect={id => setSelectedId(id)}
+                    />
+                  </div>
+                  {(() => {
+                    const withCoords = filtered.filter(l => l.lat != null && l.lng != null).length;
+                    const missing = filtered.length - withCoords;
+                    return missing > 0 ? (
+                      <p className="text-xs text-slate-400">
+                        {missing} of {filtered.length}{' '}
+                        {missing === 1 ? 'property is' : 'properties are'} not shown on the map
+                        (no location set).
+                      </p>
+                    ) : null;
+                  })()}
+                </div>
               ) : view === 'grid' ? (
                 <div
                   className={`grid grid-cols-1 gap-5 ${
@@ -192,7 +222,7 @@ export function MarketplaceDashboard({
                 </div>
               )}
 
-              {filtered.length > visibleCount && (
+              {view !== 'map' && filtered.length > visibleCount && (
                 <div className="flex flex-col items-center gap-3 pt-2">
                   <p className="text-sm text-slate-500">
                     Showing {visible.length} of {filtered.length} properties

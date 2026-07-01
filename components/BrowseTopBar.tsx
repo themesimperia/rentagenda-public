@@ -1,10 +1,10 @@
 'use client';
 
-import { X, LayoutGrid, List, SlidersHorizontal } from 'lucide-react';
+import { X, LayoutGrid, List, Map as MapIcon, SlidersHorizontal } from 'lucide-react';
 import { type MarketplaceFilters, EMPTY_FILTERS, isFiltered, countActiveFilters } from '@/lib/filter';
 
 export type SortBy = 'relevant' | 'newest' | 'price_asc' | 'price_desc' | 'available_soon';
-export type ViewMode = 'grid' | 'list';
+export type ViewMode = 'grid' | 'list' | 'map';
 
 interface BrowseTopBarProps {
   filters: MarketplaceFilters;
@@ -146,6 +146,16 @@ export function BrowseTopBar({
             }`}
           >
             <LayoutGrid className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => onViewChange('map')}
+            aria-label="Map view"
+            className={`grid h-7 w-7 place-items-center rounded-full transition-colors ${
+              view === 'map' ? 'bg-blue-600 text-white' : 'text-slate-500 hover:bg-slate-100'
+            }`}
+          >
+            <MapIcon className="h-4 w-4" />
           </button>
         </div>
       </div>
