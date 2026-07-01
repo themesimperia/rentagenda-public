@@ -63,12 +63,20 @@ export function MarketplaceDashboard({
     ...initialFilters,
   });
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<SortBy>('relevant');
   const [view, setView] = useState<ViewMode>('grid');
   const [cols, setCols] = useState<2 | 3>(2);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [filterBarOpen, setFilterBarOpen] = useState(false);
+
+  // Map view is a split layout (list left, map right); collapse the filter rail
+  // so the two panes get the full width, mirroring Zillow/Airbnb.
+  function handleViewChange(v: ViewMode) {
+    setView(v);
+    if (v === 'map') setSidebarOpen(false);
+  }
 
   const locations = useMemo(() => deriveLocations(listings), [listings]);
   const types = useMemo(() => deriveTypes(listings), [listings]);
@@ -154,7 +162,7 @@ export function MarketplaceDashboard({
                 resultCount={filtered.length}
                 loading={false}
                 view={view}
-                onViewChange={setView}
+                onViewChange={handleViewChange}
                 cols={cols}
                 onColsChange={setCols}
               />
@@ -172,43 +180,7 @@ export function MarketplaceDashboard({
                     Clear all filters
                   </button>
                 </div>
-              ) : view === 'map' ? (
-                <div className="space-y-2">
-                  <div className="h-[70vh] overflow-hidden rounded-2xl border border-slate-200">
-                    <ListingsMap
-                      listings={filtered}
-                      selectedId={selectedId}
-                      onSelect={id => setSelectedId(id)}
-                    />
-                  </div>
-                  {(() => {
-                    const withCoords = filtered.filter(l => l.lat != null && l.lng != null).length;
-                    const missing = filtered.length - withCoords;
-                    return missing > 0 ? (
-                      <p className="text-xs text-slate-400">
-                        {missing} of {filtered.length}{' '}
-                        {missing === 1 ? 'property is' : 'properties are'} not shown on the map
-                        (no location set).
-                      </p>
-                    ) : null;
-                  })()}
-                </div>
-              ) : view === 'grid' ? (
-                <div
-                  className={`grid grid-cols-1 gap-5 ${
-                    cols === 3 ? 'sm:grid-cols-2 xl:grid-cols-3' : 'sm:grid-cols-2'
-                  }`}
-                >
-                  {visible.map(listing => (
-                    <ListingCard
-                      key={listing.id}
-                      listing={listing}
-                      selected={selected?.id === listing.id}
-                      onSelect={l => setSelectedId(l.id)}
-                    />
-                  ))}
-                </div>
-              ) : (
+              ) : view === 'list' ? (
                 <div className="space-y-3">
                   {visible.map(listing => (
                     <ListingCard
@@ -220,9 +192,34 @@ export function MarketplaceDashboard({
                     />
                   ))}
                 </div>
+              ) : (
+                // Grid (and the left pane of Map view) — a card grid.
+                <div
+                  className={
+                    view === 'map'
+                      ? 'grid grid-cols-1 gap-4 sm:grid-cols-2'
+                      : `grid grid-cols-1 gap-5 ${
+                          cols === 3 ? 'sm:grid-cols-2 xl:grid-cols-3' : 'sm:grid-cols-2'
+                        }`
+                  }
+                >
+                  {visible.map(listing => (
+                    <div
+                      key={listing.id}
+                      onMouseEnter={view === 'map' ? () => setHoveredId(listing.id) : undefined}
+                      onMouseLeave={view === 'map' ? () => setHoveredId(null) : undefined}
+                    >
+                      <ListingCard
+                        listing={listing}
+                        selected={selected?.id === listing.id}
+                        onSelect={l => setSelectedId(l.id)}
+                      />
+                    </div>
+                  ))}
+                </div>
               )}
 
-              {view !== 'map' && filtered.length > visibleCount && (
+              {filtered.length > visibleCount && (
                 <div className="flex flex-col items-center gap-3 pt-2">
                   <p className="text-sm text-slate-500">
                     Showing {visible.length} of {filtered.length} properties
@@ -238,16 +235,41 @@ export function MarketplaceDashboard({
               )}
             </div>
 
-            {/* ── Detail panel ───────────────────────────────────── */}
-            <aside className="xl:w-[420px] xl:shrink-0 xl:sticky xl:top-20 xl:self-start">
-              {selected ? (
-                <DetailPanel listing={selected} permalink={`/listing/${selected.id}`} />
-              ) : (
-                <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-10 text-center text-sm text-slate-400">
-                  Select a property to see details
+            {/* ── Right pane: sticky map (Map view) or detail panel ──── */}
+            {view === 'map' ? (
+              <aside className="xl:w-[46%] xl:shrink-0 xl:sticky xl:top-20 xl:self-start">
+                <div className="h-[60vh] overflow-hidden rounded-2xl border border-slate-200 xl:h-[calc(100vh-6rem)]">
+                  <ListingsMap
+                    listings={filtered}
+                    selectedId={selectedId}
+                    hoveredId={hoveredId}
+                    onSelect={id => setSelectedId(id)}
+                    onHover={id => setHoveredId(id)}
+                  />
                 </div>
-              )}
-            </aside>
+                {(() => {
+                  const withCoords = filtered.filter(l => l.lat != null && l.lng != null).length;
+                  const missing = filtered.length - withCoords;
+                  return missing > 0 ? (
+                    <p className="mt-2 text-xs text-slate-400">
+                      {missing} of {filtered.length}{' '}
+                      {missing === 1 ? 'property is' : 'properties are'} not shown on the map
+                      (no location set).
+                    </p>
+                  ) : null;
+                })()}
+              </aside>
+            ) : (
+              <aside className="xl:w-[420px] xl:shrink-0 xl:sticky xl:top-20 xl:self-start">
+                {selected ? (
+                  <DetailPanel listing={selected} permalink={`/listing/${selected.id}`} />
+                ) : (
+                  <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-10 text-center text-sm text-slate-400">
+                    Select a property to see details
+                  </div>
+                )}
+              </aside>
+            )}
           </div>
         </div>
       </div>
